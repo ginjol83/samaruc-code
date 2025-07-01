@@ -90,8 +90,16 @@ function initializeMonaco() {
 
 // Configurar lenguajes personalizados
 function setupLanguageConfiguration() {
+    // Verificar si Monaco está disponible
+    if (!monaco) {
+        console.error('Monaco Editor no está disponible');
+        return;
+    }
+    
     // Registrar lenguaje C personalizado con mejor sintaxis
     monaco.languages.register({ id: 'c' });
+    
+    console.log('Configurando tokenización para lenguaje C...');
     
     // Configurar tokens para C
     monaco.languages.setMonarchTokensProvider('c', {
