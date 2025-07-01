@@ -252,8 +252,9 @@ async function loadTemplate(templateName) {
             window.addOutputLine?.(`Error cargando plantilla: ${error.message}`, 'error');
         }
     } else {
-        // Plantillas básicas de fallback
+        // Plantillas locales (incluyen las nuevas de C)
         const templates = {
+            // Plantillas de juegos existentes
             'spectrum': `// Plantilla para ZX Spectrum
 #include <stdio.h>
 #include <spectrum.h>
@@ -272,18 +273,135 @@ int main() {
     printf("Hola C64!");
     return 0;
 }`,
-            'basic': `// Plantilla básica
+            'basic-game': `// Juego básico
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 int main() {
-    printf("Hola mundo!");
+    // Inicializar generador de números aleatorios
+    srand(time(NULL));
+    
+    printf("=== 🎮 JUEGO BÁSICO ===\\n");
+    printf("¡Bienvenido al juego!\\n");
+    
+    // Tu código de juego aquí
+    
+    return 0;
+}`,
+            
+            // Nuevas plantillas de C
+            'c-basic': window.cHelpers?.getTemplate('basic') || `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+            
+            'c-args': window.cHelpers?.getTemplate('withArgs') || `#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        printf("Argumentos recibidos: %d\\n", argc - 1);
+        for (int i = 1; i < argc; i++) {
+            printf("  Arg %d: %s\\n", i, argv[i]);
+        }
+    } else {
+        printf("No se recibieron argumentos\\n");
+    }
+    return 0;
+}`,
+            
+            'c-struct': window.cHelpers?.getTemplate('struct') || `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char name[50];
+    int value;
+} MyStruct;
+
+int main() {
+    MyStruct item;
+    strcpy(item.name, "Ejemplo");
+    item.value = 42;
+    
+    printf("Nombre: %s, Valor: %d\\n", item.name, item.value);
+    return 0;
+}`,
+            
+            'c-fileio': window.cHelpers?.getTemplate('fileIO') || `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file;
+    char buffer[256];
+    
+    // Abrir archivo para lectura
+    file = fopen("ejemplo.txt", "r");
+    if (file == NULL) {
+        perror("Error abriendo archivo");
+        return 1;
+    }
+    
+    // Leer archivo línea por línea
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("%s", buffer);
+    }
+    
+    fclose(file);
+    return 0;
+}`,
+            
+            'c-memory': window.cHelpers?.getTemplate('memory') || `#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int *array;
+    int size = 10;
+    
+    // Asignar memoria
+    array = (int*)malloc(size * sizeof(int));
+    if (array == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria\\n");
+        return 1;
+    }
+    
+    // Inicializar array
+    for (int i = 0; i < size; i++) {
+        array[i] = i * i;
+    }
+    
+    // Mostrar valores
+    printf("Valores del array:\\n");
+    for (int i = 0; i < size; i++) {
+        printf("array[%d] = %d\\n", i, array[i]);
+    }
+    
+    // Liberar memoria
+    free(array);
+    printf("Memoria liberada\\n");
+    
     return 0;
 }`
         };
         
-        const content = templates[templateName] || templates['basic'];
-        window.openFileInEditor?.(`${templateName}.c`, content, true);
-        window.addOutputLine?.(`Plantilla básica cargada: ${templateName}`, 'success');
+        if (templates[templateName]) {
+            // Determinar el nombre del archivo según la plantilla
+            let fileName = 'nuevo_archivo.c';
+            if (templateName.startsWith('c-')) {
+                const templateType = templateName.replace('c-', '');
+                fileName = `${templateType}_ejemplo.c`;
+            } else if (templateName.includes('game')) {
+                fileName = `${templateName.replace('-', '_')}.c`;
+            }
+            
+            // Abrir el archivo con la plantilla
+            window.openFileInEditor?.(fileName, templates[templateName], true);
+            window.addOutputLine?.(`✅ Plantilla '${templateName}' cargada correctamente`, 'success');
+        } else {
+            window.addOutputLine?.(`❌ Plantilla '${templateName}' no encontrada`, 'error');
+        }
     }
 }
 

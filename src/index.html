@@ -44,9 +44,18 @@
             <div class="toolbar-section">
                 <select id="template-select" class="form-control">
                     <option value="">Seleccionar plantilla...</option>
-                    <option value="basic-game">Juego Básico</option>
-                    <option value="platform-game">Juego de Plataformas</option>
-                    <option value="shooter-game">Juego de Disparos</option>
+                    <optgroup label="🎮 Plantillas de Juegos">
+                        <option value="basic-game">Juego Básico</option>
+                        <option value="platform-game">Juego de Plataformas</option>
+                        <option value="shooter-game">Juego de Disparos</option>
+                    </optgroup>
+                    <optgroup label="📝 Plantillas de C">
+                        <option value="c-basic">Programa Básico</option>
+                        <option value="c-args">Con Argumentos</option>
+                        <option value="c-struct">Con Estructuras</option>
+                        <option value="c-fileio">Manejo de Archivos</option>
+                        <option value="c-memory">Gestión de Memoria</option>
+                    </optgroup>
                 </select>
                 <button id="load-template-btn" class="btn btn-info" title="Cargar plantilla">
                     <i class="fas fa-download"></i>

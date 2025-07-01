@@ -34,6 +34,17 @@ function setupEventListeners() {
     if (elements.loadTemplateBtn) elements.loadTemplateBtn.addEventListener('click', window.loadSelectedTemplate);
     if (elements.openProjectBtn) elements.openProjectBtn.addEventListener('click', window.openProject);
     
+    // Selector de plantillas
+    const templateSelect = document.getElementById('template-select');
+    if (templateSelect) {
+        templateSelect.addEventListener('change', function() {
+            if (this.value) {
+                window.loadTemplate?.(this.value);
+                this.value = ''; // Resetear selección
+            }
+        });
+    }
+    
     // Pestañas del panel inferior
     document.querySelectorAll('.panel-tab').forEach(tab => {
         tab.addEventListener('click', () => {

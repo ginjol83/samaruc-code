@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test - Abrir Archivos</title>
+    <!-- Prism.js para resaltado de sintaxis -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,6 +43,38 @@
         .error { color: #f44747; }
         .info { color: #569cd6; }
         .warning { color: #dcdcaa; }
+        
+        .code-editor {
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            padding: 0;
+            margin: 20px 0;
+            border-radius: 4px;
+            min-height: 300px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow: auto;
+        }
+        
+        .code-editor pre {
+            margin: 0;
+            padding: 15px;
+            background: transparent;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .code-editor code {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .file-info {
+            background: #252526;
+            padding: 10px;
+            border-bottom: 1px solid #3e3e42;
+            font-size: 12px;
+            color: #cccccc;
+        }
     </style>
 </head>
 <body>
@@ -49,7 +88,10 @@
             🔍 Debug Info
         </button>
         <button class="btn" onclick="testDirectOpen()">
-            ⚡ Prueba Directa
+            ⚡ Prueba Directa (C)
+        </button>
+        <button class="btn" onclick="testCppExample()">
+            🔧 Ejemplo C++
         </button>
         <button class="btn" onclick="clearOutput()">
             🗑️ Limpiar
@@ -58,6 +100,13 @@
     
     <div id="output" class="output">
         <div class="info">[INFO] Listo para probar...</div>
+    </div>
+
+    <div id="code-container" class="code-editor" style="display: none;">
+        <div id="file-info" class="file-info">
+            Ningún archivo abierto
+        </div>
+        <pre><code id="code-display" class="language-c"></code></pre>
     </div>
 
     <script>
@@ -97,8 +146,12 @@
         function getLanguageFromFile(filePath) {
             const ext = path.extname(filePath).toLowerCase();
             const map = {
-                '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.js': 'javascript',
-                '.html': 'html', '.css': 'css', '.py': 'python', '.md': 'markdown'
+                '.c': 'c', '.h': 'c', '.cpp': 'cpp', '.cxx': 'cpp', '.cc': 'cpp',
+                '.js': 'javascript', '.jsx': 'javascript', '.ts': 'typescript',
+                '.html': 'html', '.htm': 'html', '.css': 'css', 
+                '.py': 'python', '.md': 'markdown', '.txt': 'plaintext',
+                '.json': 'json', '.xml': 'xml', '.java': 'java',
+                '.php': 'php', '.rb': 'ruby', '.go': 'go', '.rs': 'rust'
             };
             return map[ext] || 'plaintext';
         }
@@ -137,6 +190,33 @@
             recentFiles.unshift(filePath);
             if (recentFiles.length > 10) recentFiles.pop();
             addOutput(`Añadido a recientes: ${path.basename(filePath)}`, 'info');
+        }
+        
+        // Función para mostrar código con resaltado de sintaxis
+        function displayCodeWithSyntaxHighlight(filePath, content, language) {
+            const codeContainer = document.getElementById('code-container');
+            const fileInfo = document.getElementById('file-info');
+            const codeDisplay = document.getElementById('code-display');
+            
+            // Mostrar información del archivo
+            const fileSize = formatFileSize(content.length);
+            const lines = content.split('\n').length;
+            fileInfo.textContent = `📄 ${path.basename(filePath)} | ${language.toUpperCase()} | ${fileSize} | ${lines} líneas`;
+            
+            // Establecer el lenguaje y el contenido
+            codeDisplay.className = `language-${language}`;
+            codeDisplay.textContent = content;
+            
+            // Aplicar resaltado de sintaxis
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightElement(codeDisplay);
+                addOutput(`✨ Resaltado de sintaxis aplicado (${language})`, 'success');
+            } else {
+                addOutput('⚠️ Prism.js no disponible, mostrando texto plano', 'warning');
+            }
+            
+            // Mostrar el contenedor
+            codeContainer.style.display = 'block';
         }
         
         // Función principal: openFileInEditor
@@ -194,6 +274,9 @@
             createTab(filePath);
             switchToFile(filePath);
             updateWindowTitle(filePath);
+            
+            // Mostrar código con resaltado de sintaxis
+            displayCodeWithSyntaxHighlight(filePath, content, language);
             
             if (!isNew && (filePath.includes('/') || filePath.includes('\\\\'))) {
                 addToRecentFiles(filePath);
@@ -261,13 +344,148 @@
             addOutput('Probando apertura directa...', 'info');
             
             const testContent = `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+// Estructura para demostrar resaltado
+typedef struct {
+    char name[50];
+    int age;
+    float height;
+} Person;
+
+// Función para crear una persona
+Person* createPerson(const char* name, int age, float height) {
+    Person* p = (Person*)malloc(sizeof(Person));
+    if (p == NULL) {
+        fprintf(stderr, "Error: No se pudo asignar memoria\\n");
+        return NULL;
+    }
+    
+    strncpy(p->name, name, sizeof(p->name) - 1);
+    p->name[sizeof(p->name) - 1] = '\\0';
+    p->age = age;
+    p->height = height;
+    
+    return p;
+}
+
+// Función principal
 int main() {
-    printf("¡Archivo de prueba abierto correctamente!\\n");
+    printf("=== 🐟 Samaruc Code - Prueba de Resaltado de Sintaxis ===\\n");
+    
+    // Crear una persona de ejemplo
+    Person* person = createPerson("Juan Pérez", 25, 1.75f);
+    
+    if (person != NULL) {
+        printf("Persona creada:\\n");
+        printf("  Nombre: %s\\n", person->name);
+        printf("  Edad: %d años\\n", person->age);
+        printf("  Altura: %.2f metros\\n", person->height);
+        
+        // Liberar memoria
+        free(person);
+        printf("\\n✅ Memoria liberada correctamente\\n");
+    } else {
+        printf("❌ Error al crear la persona\\n");
+        return 1;
+    }
+    
+    // Bucle de ejemplo
+    printf("\\nContando del 1 al 5:\\n");
+    for (int i = 1; i <= 5; i++) {
+        printf("%d ", i);
+    }
+    printf("\\n");
+    
+    printf("\\n🎉 ¡Programa ejecutado correctamente!\\n");
     return 0;
 }`;
             
-            openFileInEditor('test-direct.c', testContent, true);
+            openFileInEditor('ejemplo-sintaxis.c', testContent, true);
+        }
+        
+        // Función de prueba C++
+        function testCppExample() {
+            addOutput('Probando ejemplo C++...', 'info');
+            
+            const cppContent = `#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+// Clase de ejemplo
+class Estudiante {
+private:
+    std::string nombre;
+    int edad;
+    std::vector<float> calificaciones;
+
+public:
+    // Constructor
+    Estudiante(const std::string& n, int e) : nombre(n), edad(e) {}
+    
+    // Método para agregar calificación
+    void agregarCalificacion(float calif) {
+        if (calif >= 0.0f && calif <= 10.0f) {
+            calificaciones.push_back(calif);
+        }
+    }
+    
+    // Método para calcular promedio
+    float calcularPromedio() const {
+        if (calificaciones.empty()) return 0.0f;
+        
+        float suma = 0.0f;
+        for (const auto& calif : calificaciones) {
+            suma += calif;
+        }
+        return suma / calificaciones.size();
+    }
+    
+    // Getters
+    const std::string& getNombre() const { return nombre; }
+    int getEdad() const { return edad; }
+    
+    // Método para mostrar información
+    void mostrarInfo() const {
+        std::cout << "Estudiante: " << nombre << std::endl;
+        std::cout << "Edad: " << edad << " años" << std::endl;
+        std::cout << "Promedio: " << calcularPromedio() << std::endl;
+    }
+};
+
+int main() {
+    std::cout << "=== 🐟 Samaruc Code - Ejemplo C++ ===" << std::endl;
+    
+    // Crear estudiante
+    Estudiante est("María García", 20);
+    
+    // Agregar calificaciones
+    std::vector<float> califs = {8.5f, 9.2f, 7.8f, 9.0f, 8.7f};
+    
+    for (const auto& calif : califs) {
+        est.agregarCalificacion(calif);
+    }
+    
+    // Mostrar información
+    est.mostrarInfo();
+    
+    // Usar algoritmos STL
+    std::vector<int> numeros = {5, 2, 8, 1, 9, 3};
+    std::sort(numeros.begin(), numeros.end());
+    
+    std::cout << "\\nNúmeros ordenados: ";
+    for (const auto& num : numeros) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "\\n🎉 ¡Ejemplo C++ completado!" << std::endl;
+    return 0;
+}`;
+            
+            openFileInEditor('ejemplo-cpp.cpp', cppContent, true);
         }
     </script>
 </body>
