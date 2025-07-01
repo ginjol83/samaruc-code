@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samaruc Code</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Barra de herramientas -->
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <button id="new-file-btn" class="btn btn-primary tooltip" title="Nuevo archivo (Ctrl+N)" data-tooltip="Crear nuevo archivo">
+                    <i class="fas fa-file-plus"></i>
+                </button>
+                <div class="file-action-buttons">
+                    <button id="open-file-btn" class="btn btn-primary tooltip" title="Abrir archivo (Ctrl+O)" data-tooltip="Abrir archivo">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                    <div class="recent-files-dropdown">
+                        <button id="recent-files-btn" class="recent-files-btn tooltip" title="Archivos recientes" data-tooltip="Ver archivos recientes">
+                            <i class="fas fa-history"></i>
+                        </button>
+                        <div id="recent-files-menu" class="recent-files-menu">
+                            <!-- Los archivos recientes se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+                <button id="save-file-btn" class="btn btn-primary tooltip" title="Guardar (Ctrl+S)" data-tooltip="Guardar archivo actual">
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
+            <div class="toolbar-section">
+                <button id="compile-btn" class="btn btn-success" title="Compilar (F5)">
+                    <i class="fas fa-hammer"></i> Compilar
+                </button>
+                <button id="run-btn" class="btn btn-success" title="Compilar y Ejecutar (F6)">
+                    <i class="fas fa-play"></i> Ejecutar
+                </button>
+            </div>
+            <div class="toolbar-section">
+                <select id="template-select" class="form-control">
+                    <option value="">Seleccionar plantilla...</option>
+                    <option value="basic-game">Juego Básico</option>
+                    <option value="platform-game">Juego de Plataformas</option>
+                    <option value="shooter-game">Juego de Disparos</option>
+                </select>
+                <button id="load-template-btn" class="btn btn-info" title="Cargar plantilla">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Panel principal -->
+        <div class="main-panel">
+            <!-- Explorador de archivos -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-folder-tree"></i> Explorador</h3>
+                </div>
+                <div class="file-explorer" id="file-explorer">
+                    <div class="no-project">
+                        <p>No hay proyecto abierto</p>
+                        <button id="open-project-btn" class="btn btn-secondary">
+                            <i class="fas fa-folder-open"></i> Abrir Proyecto
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="editor-container">
+                <div class="editor-tabs" id="editor-tabs">
+                    <!-- Las pestañas se agregarán dinámicamente -->
+                </div>
+                <div class="editor-content">
+                    <div id="monaco-editor" class="monaco-editor-container">
+                        <div class="welcome-screen">
+                            <div class="welcome-content">
+                                <h1><i class="fas fa-fish"></i> Samaruc Code</h1>
+                                <p>IDE para desarrollo de juegos retro en C</p>
+                                <div class="welcome-actions">
+                                    <button class="btn btn-primary btn-large" onclick="openProject()">
+                                        <i class="fas fa-folder-open"></i> Abrir Proyecto
+                                    </button>
+                                    <button class="btn btn-secondary btn-large" onclick="createNewProject()">
+                                        <i class="fas fa-plus"></i> Nuevo Proyecto
+                                    </button>
+                                </div>
+                                <div class="templates-section">
+                                    <h3>Plantillas de Juegos</h3>
+                                    <div class="template-grid">
+                                        <div class="template-card" onclick="loadTemplate('basic-game')">
+                                            <i class="fas fa-cube"></i>
+                                            <h4>Juego Básico</h4>
+                                            <p>Estructura básica para un juego simple</p>
+                                        </div>
+                                        <div class="template-card" onclick="loadTemplate('platform-game')">
+                                            <i class="fas fa-running"></i>
+                                            <h4>Plataformas</h4>
+                                            <p>Juego de plataformas estilo Mario</p>
+                                        </div>
+                                        <div class="template-card" onclick="loadTemplate('shooter-game')">
+                                            <i class="fas fa-crosshairs"></i>
+                                            <h4>Disparos</h4>
+                                            <p>Juego de disparos estilo Space Invaders</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel inferior -->
+        <div class="bottom-panel">
+            <div class="panel-tabs">
+                <button class="panel-tab active" data-panel="output">
+                    <i class="fas fa-terminal"></i> Salida
+                </button>
+                <button class="panel-tab" data-panel="terminal">
+                    <i class="fas fa-code"></i> Terminal
+                </button>
+                <button class="panel-tab" data-panel="problems">
+                    <i class="fas fa-exclamation-triangle"></i> Problemas
+                </button>
+            </div>
+            <div class="panel-content">
+                <div id="output-panel" class="panel-section active">
+                    <div id="output-content" class="console-output">
+                        <div class="output-line">Listo para compilar...</div>
+                    </div>
+                </div>
+                <div id="terminal-panel" class="panel-section">
+                    <div id="terminal-content" class="terminal-output">
+                        <!-- Terminal integrada -->
+                    </div>
+                </div>
+                <div id="problems-panel" class="panel-section">
+                    <div id="problems-content" class="problems-list">
+                        <div class="no-problems">No hay problemas detectados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Configurar Monaco Editor desde CDN
+        require = { paths: { 'vs': 'https://unpkg.com/monaco-editor@0.34.0/min/vs' } };
+    </script>
+    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
+    <script src="renderer.js"></script>
+</body>
+</html>

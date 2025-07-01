@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4EC9B0;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#569CD6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0E639C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="codeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DCDCAA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#CE9178;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo circular -->
+  <circle cx="128" cy="128" r="120" fill="#1E1E1E" stroke="#3E3E42" stroke-width="4"/>
+  
+  <!-- Cuerpo del pez samaruc -->
+  <ellipse cx="128" cy="128" rx="80" ry="35" fill="url(#fishGradient)"/>
+  
+  <!-- Aletas -->
+  <ellipse cx="95" cy="105" rx="15" ry="8" fill="#4EC9B0" transform="rotate(-30 95 105)"/>
+  <ellipse cx="95" cy="151" rx="15" ry="8" fill="#4EC9B0" transform="rotate(30 95 151)"/>
+  
+  <!-- Cola -->
+  <path d="M 50 128 Q 30 110 35 90 Q 40 128 35 166 Q 30 146 50 128" fill="#569CD6"/>
+  
+  <!-- Ojo -->
+  <circle cx="150" cy="115" r="8" fill="#F44747"/>
+  <circle cx="152" cy="113" r="3" fill="#FFFFFF"/>
+  
+  <!-- Elementos de código en el pez -->
+  <text x="110" y="125" font-family="Consolas, monospace" font-size="10" fill="url(#codeGradient)">&lt;/&gt;</text>
+  <text x="125" y="140" font-family="Consolas, monospace" font-size="8" fill="#6A9955">{}</text>
+  
+  <!-- Líneas de código decorativas -->
+  <rect x="80" y="160" width="40" height="2" fill="#CE9178" opacity="0.6"/>
+  <rect x="85" y="165" width="30" height="2" fill="#DCDCAA" opacity="0.6"/>
+  <rect x="90" y="170" width="25" height="2" fill="#4EC9B0" opacity="0.6"/>
+  
+  <!-- Texto del nombre -->
+  <text x="128" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#D4D4D4">SAMARUC</text>
+  <text x="128" y="230" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#858585">CODE</text>
+</svg>

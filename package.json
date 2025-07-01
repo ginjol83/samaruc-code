@@ -1,0 +1,51 @@
+{
+  "name": "samaruc-code",
+  "version": "1.0.0",
+  "description": "Samaruc Code - IDE para desarrollo de juegos retro en C",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"npm run serve\" \"wait-on http://localhost:8080 && electron src-vue/main-electron.js\"",
+    "serve": "vue-cli-service serve src-vue/main.js",
+    "build": "vue-cli-service build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "electron:build": "vue-cli-service electron:build",
+    "build-vue": "npm run build && electron-builder",
+    "setup": "npm install && echo Setup complete!",
+    "setup-vue": "npm install vue@3.3.4 vuex@4.1.0 @vue/cli-service vue-cli-plugin-electron-builder"
+  },
+  "author": "Tu Nombre",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^23.0.0",
+    "@vue/cli-service": "^5.0.8",
+    "vue-cli-plugin-electron-builder": "^2.1.1",
+    "concurrently": "^7.6.0",
+    "wait-on": "^6.0.1",
+    "path-browserify": "^1.0.1"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.34.0",
+    "vue": "^3.3.4",
+    "vuex": "^4.1.0",
+    "vue-router": "^4.2.4"
+  },
+  "build": {
+    "appId": "com.samaruccode.app",
+    "productName": "Samaruc Code",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "templates/**/*",
+      "examples/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "src/assets/samaruc-icon.ico"
+    }
+  }
+}

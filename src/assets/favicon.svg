@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4EC9B0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0E639C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo circular -->
+  <circle cx="16" cy="16" r="15" fill="#1E1E1E" stroke="#3E3E42" stroke-width="1"/>
+  
+  <!-- Cuerpo del pez samaruc -->
+  <ellipse cx="16" cy="16" rx="10" ry="4" fill="url(#fishGradient)"/>
+  
+  <!-- Aletas -->
+  <ellipse cx="12" cy="13" rx="2" ry="1" fill="#4EC9B0" transform="rotate(-30 12 13)"/>
+  <ellipse cx="12" cy="19" rx="2" ry="1" fill="#4EC9B0" transform="rotate(30 12 19)"/>
+  
+  <!-- Cola -->
+  <path d="M 6 16 Q 4 14 4.5 12 Q 5 16 4.5 20 Q 4 18 6 16" fill="#569CD6"/>
+  
+  <!-- Ojo -->
+  <circle cx="19" cy="14" r="1" fill="#F44747"/>
+  
+  <!-- Elemento de código -->
+  <text x="14" y="18" font-family="Consolas, monospace" font-size="3" fill="#DCDCAA">&lt;/&gt;</text>
+</svg>
