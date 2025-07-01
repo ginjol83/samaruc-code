@@ -425,4 +425,4 @@ if (typeof window !== 'undefined') {
     window.loadTemplate = loadTemplate;
 }
 
-console.log('🐟 Samaruc Code renderer.js cargado');
+//console.log('🐟 Samaruc Code renderer.js cargado');

@@ -8,15 +8,22 @@ let recentFiles = [];
 // Inicializar IPC de Electron de forma segura
 function initializeElectronIpc() {
     try {
-        if (typeof require !== 'undefined') {
-            const { ipcRenderer } = require('electron');
+        // Verificar si estamos en un contexto de Electron
+        if (window.require && window.process && window.process.versions && window.process.versions.electron) {
+            const { ipcRenderer } = window.require('electron');
             electronIpc = ipcRenderer;
             console.log('Electron IPC inicializado correctamente');
             return true;
         }
+        
+        // NO usar require('electron') directo ya que causa conflictos con AMD
+        console.log('No se detectó contexto de Electron válido');
+        
     } catch (error) {
         console.warn('No se pudo inicializar Electron IPC:', error.message);
     }
+    
+    console.log('Ejecutándose en modo navegador web - funcionalidad limitada');
     return false;
 }
 

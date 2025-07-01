@@ -3,7 +3,7 @@
 
 // Configurar event listeners principales
 function setupEventListeners() {
-    console.log('Configurando event listeners...');
+//    console.log('Configurando event listeners...');
     
     // Verificar que los elementos existan antes de asignar event listeners
     const elements = {
@@ -16,9 +16,10 @@ function setupEventListeners() {
         openProjectBtn: document.getElementById('open-project-btn')
     };
     
-    console.log('Elementos encontrados:', Object.fromEntries(
+/*    console.log('Elementos encontrados:', Object.fromEntries(
         Object.entries(elements).map(([key, value]) => [key, !!value])
     ));
+*/
     
     // Botones de la toolbar
     if (elements.newFileBtn) elements.newFileBtn.addEventListener('click', window.createNewFile);
@@ -55,7 +56,7 @@ function setupEventListeners() {
     // Configurar atajos de teclado
     setupKeyboardShortcuts();
     
-    console.log('Event listeners configurados');
+ //   console.log('Event listeners configurados');
 }
 
 // Configurar atajos de teclado
@@ -119,7 +120,7 @@ function setupKeyboardShortcuts() {
             }
         });
         
-        console.log('Atajos de teclado configurados');
+       // console.log('Atajos de teclado configurados');
     } catch (error) {
         console.warn('Error configurando atajos de teclado:', error);
     }
@@ -167,7 +168,7 @@ function initializeDragAndDrop() {
             });
         }
         
-        console.log('Drag and drop inicializado');
+       // console.log('Drag and drop inicializado');
     } catch (error) {
         console.warn('Error inicializando drag and drop:', error);
     }
