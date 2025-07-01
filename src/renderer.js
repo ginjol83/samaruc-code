@@ -1465,15 +1465,315 @@ function showSamarucMessage() {
 // Mostrar mensaje de bienvenida especial cada vez que se abre un archivo
 let filesOpenedCount = 0;
 
-// Inicializar funciones esenciales como fallback
-try {
-    setupEventListeners();
-    setupKeyboardShortcuts();
-    initializeRecentFiles();
-    initializeDragAndDrop();
-    initializeBasicEditor();
-    addOutputLine('IDE iniciado en modo básico', 'warning');
-} catch (fallbackError) {
-    console.error('Error crítico en fallback:', fallbackError);
-    addOutputLine(`Error crítico: ${fallbackError.message}`, 'error');
+// ===== FUNCIONES DE PROYECTO =====
+
+// Función para crear un nuevo proyecto (versión simplificada)
+async function createNewProject() {
+    console.log('createNewProject() llamada');
+    addOutputLine('🐟 Iniciando creación de nuevo proyecto...', 'info');
+    
+    try {
+        // Usar un diálogo personalizado en lugar de prompt
+        const projectName = await showProjectNameDialog();
+        if (!projectName) {
+            addOutputLine('Creación de proyecto cancelada', 'warning');
+            return;
+        }
+        
+        // Limpiar nombre del proyecto
+        const cleanProjectName = projectName.trim().replace(/[^a-zA-Z0-9\-_]/g, '-');
+        
+        // Configuración por defecto (sin diálogos complicados por ahora)
+        const buildConfig = {
+            platform: "spectrum",
+            compiler: "sdcc",
+            target: "z80"
+        };
+        
+        addOutputLine(`Configuración: ${buildConfig.platform}/${buildConfig.compiler}/${buildConfig.target}`, 'info');
+        
+        // Usar el IPC para mostrar diálogo de selección de carpeta
+        if (electronIpc) {
+            try {
+                const result = await electronIpc.invoke('show-save-dialog', {
+                    title: 'Seleccionar ubicación para el proyecto',
+                    defaultPath: cleanProjectName,
+                    properties: ['createDirectory'],
+                    buttonLabel: 'Crear Proyecto Aquí'
+                });
+                
+                if (result.canceled) {
+                    addOutputLine('Selección de ubicación cancelada', 'info');
+                    return;
+                }
+                
+                const projectPath = result.filePath;
+                addOutputLine(`Creando proyecto en: ${projectPath}`, 'info');
+                
+                // Crear el proyecto usando IPC
+                const createResult = await electronIpc.invoke('create-project', 
+                    projectPath, 
+                    cleanProjectName, 
+                    buildConfig
+                );
+                
+                if (createResult.success) {
+                    addOutputLine(`✅ Proyecto "${cleanProjectName}" creado exitosamente!`, 'success');
+                    addOutputLine(`📁 Ubicación: ${projectPath}`, 'info');
+                    addOutputLine(`📄 Archivos creados: ${createResult.files.join(', ')}`, 'info');
+                    addOutputLine(`🔧 Configuración: ${buildConfig.platform}/${buildConfig.compiler}/${buildConfig.target}`, 'info');
+                    
+                    // Mostrar mensaje motivacional del samaruc
+                    setTimeout(() => {
+                        showSamarucMessage();
+                    }, 1000);
+                    
+                    // Preguntar si abrir el proyecto recién creado
+                    const shouldOpen = await showConfirmDialog('¿Deseas abrir el proyecto recién creado?');
+                    if (shouldOpen) {
+                        // Abrir el archivo main.c del proyecto
+                        const mainCPath = safePath.join(projectPath, 'main.c');
+                        openFileFromPath(mainCPath);
+                    }
+                    
+                } else {
+                    addOutputLine(`❌ Error creando proyecto: ${createResult.error}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error en createNewProject:', error);
+                addOutputLine(`Error en creación de proyecto: ${error.message}`, 'error');
+            }
+        } else {
+            // Fallback para navegador
+            addOutputLine('⚠️  Función de crear proyecto solo disponible en Electron', 'warning');
+            addOutputLine('Para crear proyectos manualmente:', 'info');
+            addOutputLine(`1. Crear carpeta: ${cleanProjectName}`, 'info');
+            addOutputLine(`2. Crear archivo build.json con la configuración`, 'info');
+            addOutputLine(`3. Crear archivo main.c con el código inicial`, 'info');
+            
+            // Mostrar configuración que se habría creado
+            const configExample = JSON.stringify(buildConfig, null, 2);
+            addOutputLine(`Configuración build.json:`, 'info');
+            addOutputLine(configExample, 'info');
+        }
+        
+    } catch (error) {
+        console.error('Error en createNewProject:', error);
+        addOutputLine(`Error creando proyecto: ${error.message}`, 'error');
+    }
 }
+
+// Función auxiliar para mostrar diálogo de nombre de proyecto
+async function showProjectNameDialog() {
+    return new Promise((resolve) => {
+        // Crear un diálogo personalizado
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-family: 'Segoe UI', sans-serif;
+        `;
+        
+        dialog.innerHTML = `
+            <div style="background: #2d2d30; padding: 20px; border-radius: 8px; border: 1px solid #3e3e42; min-width: 300px;">
+                <h3 style="color: #d4d4d4; margin-bottom: 15px;">🐟 Nuevo Proyecto Samaruc</h3>
+                <label style="color: #d4d4d4; display: block; margin-bottom: 5px;">Nombre del proyecto:</label>
+                <input type="text" id="projectNameInput" value="mi-juego-retro" 
+                       style="width: 100%; padding: 8px; background: #1e1e1e; color: #d4d4d4; border: 1px solid #3e3e42; border-radius: 4px; margin-bottom: 15px;">
+                <div style="text-align: right;">
+                    <button id="cancelBtn" style="background: #6c6c6c; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 8px; cursor: pointer;">Cancelar</button>
+                    <button id="createBtn" style="background: #0e639c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Crear</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+        
+        const input = dialog.querySelector('#projectNameInput');
+        const cancelBtn = dialog.querySelector('#cancelBtn');
+        const createBtn = dialog.querySelector('#createBtn');
+        
+        input.focus();
+        input.select();
+        
+        const cleanup = () => {
+            document.body.removeChild(dialog);
+        };
+        
+        cancelBtn.onclick = () => {
+            cleanup();
+            resolve(null);
+        };
+        
+        createBtn.onclick = () => {
+            const name = input.value.trim();
+            cleanup();
+            resolve(name || null);
+        };
+        
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                createBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        };
+    });
+}
+
+// Función auxiliar para mostrar diálogo de confirmación
+async function showConfirmDialog(message) {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-family: 'Segoe UI', sans-serif;
+        `;
+        
+        dialog.innerHTML = `
+            <div style="background: #2d2d30; padding: 20px; border-radius: 8px; border: 1px solid #3e3e42; min-width: 300px;">
+                <h3 style="color: #d4d4d4; margin-bottom: 15px;">🐟 Samaruc Code</h3>
+                <p style="color: #d4d4d4; margin-bottom: 20px;">${message}</p>
+                <div style="text-align: right;">
+                    <button id="noBtn" style="background: #6c6c6c; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 8px; cursor: pointer;">No</button>
+                    <button id="yesBtn" style="background: #0e639c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Sí</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+        
+        const noBtn = dialog.querySelector('#noBtn');
+        const yesBtn = dialog.querySelector('#yesBtn');
+        
+        const cleanup = () => {
+            document.body.removeChild(dialog);
+        };
+        
+        noBtn.onclick = () => {
+            cleanup();
+            resolve(false);
+        };
+        
+        yesBtn.onclick = () => {
+            cleanup();
+            resolve(true);
+        };
+    });
+}
+
+// Función para abrir proyecto existente
+async function openProject() {
+    console.log('openProject() llamada');
+    addOutputLine('📂 Abriendo proyecto...', 'info');
+    
+    try {
+        if (electronIpc) {
+            const result = await electronIpc.invoke('show-open-dialog', {
+                title: 'Seleccionar carpeta del proyecto',
+                properties: ['openDirectory'],
+                buttonLabel: 'Abrir Proyecto'
+            });
+            
+            if (result.canceled) {
+                addOutputLine('Apertura de proyecto cancelada', 'info');
+                return;
+            }
+            
+            const projectPath = result.filePaths[0];
+            addOutputLine(`Abriendo proyecto desde: ${projectPath}`, 'info');
+            
+            // Buscar archivos principales del proyecto
+            const listResult = await electronIpc.invoke('list-directory', projectPath);
+            
+            if (listResult.success) {
+                const files = listResult.items.filter(item => !item.isDirectory);
+                const cFiles = files.filter(file => file.name.endsWith('.c') || file.name.endsWith('.h'));
+                const buildJson = files.find(file => file.name === 'build.json');
+                
+                addOutputLine(`📄 Encontrados ${files.length} archivos (${cFiles.length} de código)`, 'info');
+                
+                if (buildJson) {
+                    // Leer configuración del proyecto
+                    const buildResult = await electronIpc.invoke('read-file', buildJson.path);
+                    if (buildResult.success) {
+                        try {
+                            const config = JSON.parse(buildResult.content);
+                            addOutputLine(`🔧 Configuración: ${config.platform}/${config.compiler}/${config.target}`, 'info');
+                        } catch (e) {
+                            addOutputLine('⚠️ Archivo build.json no válido', 'warning');
+                        }
+                    }
+                }
+                
+                // Abrir archivo principal si existe
+                const mainFile = files.find(file => 
+                    file.name === 'main.c' || 
+                    file.name === 'index.c' || 
+                    file.name.toLowerCase().includes('main')
+                );
+                
+                if (mainFile) {
+                    openFileFromPath(mainFile.path);
+                    addOutputLine(`📖 Abriendo archivo principal: ${mainFile.name}`, 'success');
+                } else if (cFiles.length > 0) {
+                    openFileFromPath(cFiles[0].path);
+                    addOutputLine(`📖 Abriendo primer archivo de código: ${cFiles[0].name}`, 'success');
+                }
+                
+                currentProject = projectPath;
+                addOutputLine('🎯 Proyecto abierto correctamente', 'success');
+                
+            } else {
+                addOutputLine(`Error listando archivos: ${listResult.error}`, 'error');
+            }
+            
+        } else {
+            addOutputLine('⚠️  Función de abrir proyecto solo disponible en Electron', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Error en openProject:', error);
+        addOutputLine(`Error abriendo proyecto: ${error.message}`, 'error');
+    }
+}
+
+// Función auxiliar para abrir archivo desde path
+async function openFileFromPath(filePath) {
+    try {
+        if (electronIpc) {
+            const result = await electronIpc.invoke('read-file', filePath);
+            if (result.success) {
+                openFileInEditor(filePath, result.content, false);
+            } else {
+                addOutputLine(`Error leyendo archivo: ${result.error}`, 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error abriendo archivo:', error);
+        addOutputLine(`Error: ${error.message}`, 'error');
+    }
+}
+
+// Exponer funciones globalmente para acceso desde HTML
+window.createNewProject = createNewProject;
+window.openProject = openProject;
+window.openFileFromPath = openFileFromPath;

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Crear Proyecto - Samaruc Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .btn {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            display: block;
+            width: 200px;
+        }
+        .btn:hover {
+            background: #1177bb;
+        }
+        .output {
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            min-height: 200px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f44747; }
+        .info { color: #569cd6; }
+        .warning { color: #dcdcaa; }
+    </style>
+</head>
+<body>
+    <h1>🐟 Test Crear Proyecto - Samaruc Code</h1>
+    
+    <div>
+        <button class="btn" onclick="testCreateProject()">
+            🏗️ Test Crear Proyecto
+        </button>
+        <button class="btn" onclick="testOpenProject()">
+            📂 Test Abrir Proyecto
+        </button>
+        <button class="btn" onclick="testBasicFunction()">
+            🔧 Test Funciones Básicas
+        </button>
+        <button class="btn" onclick="clearOutput()">
+            🗑️ Limpiar Output
+        </button>
+    </div>
+    
+    <div id="output" class="output">
+[INFO] Test de creación de proyectos - Samaruc Code
+[INFO] Listo para probar...
+    </div>
+
+    <script>
+        // Funciones de test
+        function addOutput(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `\n[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = '[INFO] Output limpiado...\n';
+        }
+        
+        function testBasicFunction() {
+            addOutput('🔍 Probando funciones básicas...', 'info');
+            
+            // Test safePath
+            try {
+                const testPath = '/test/path/file.c';
+                addOutput(`basename: ${safePath?.basename ? safePath.basename(testPath) : 'No disponible'}`, 'info');
+                addOutput(`extname: ${safePath?.extname ? safePath.extname(testPath) : 'No disponible'}`, 'info');
+                addOutput(`join: ${safePath?.join ? safePath.join('test', 'path', 'file.c') : 'No disponible'}`, 'info');
+            } catch (error) {
+                addOutput(`Error en safePath: ${error.message}`, 'error');
+            }
+            
+            // Test electronIpc
+            addOutput(`electronIpc disponible: ${typeof electronIpc !== 'undefined' && electronIpc !== null}`, 'info');
+            
+            // Test funciones de proyecto
+            addOutput(`createNewProject: ${typeof createNewProject}`, 'info');
+            addOutput(`openProject: ${typeof openProject}`, 'info');
+            
+            addOutput('✅ Test básico completado', 'success');
+        }
+        
+        async function testCreateProject() {
+            addOutput('🏗️ Iniciando test de crear proyecto...', 'info');
+            
+            try {
+                if (typeof createNewProject === 'function') {
+                    addOutput('Llamando a createNewProject()...', 'info');
+                    await createNewProject();
+                } else {
+                    addOutput('❌ createNewProject no está definida', 'error');
+                }
+            } catch (error) {
+                addOutput(`❌ Error en createNewProject: ${error.message}`, 'error');
+                console.error('Error detallado:', error);
+            }
+        }
+        
+        async function testOpenProject() {
+            addOutput('📂 Iniciando test de abrir proyecto...', 'info');
+            
+            try {
+                if (typeof openProject === 'function') {
+                    addOutput('Llamando a openProject()...', 'info');
+                    await openProject();
+                } else {
+                    addOutput('❌ openProject no está definida', 'error');
+                }
+            } catch (error) {
+                addOutput(`❌ Error en openProject: ${error.message}`, 'error');
+                console.error('Error detallado:', error);
+            }
+        }
+        
+        // Simular algunas funciones para testing
+        if (typeof safePath === 'undefined') {
+            window.safePath = {
+                basename: (path) => path.split(/[\\/]/).pop(),
+                extname: (path) => {
+                    const name = path.split(/[\\/]/).pop();
+                    const lastDot = name.lastIndexOf('.');
+                    return lastDot > 0 ? name.substring(lastDot) : '';
+                },
+                join: (...parts) => parts.join('/')
+            };
+        }
+        
+        if (typeof electronIpc === 'undefined') {
+            window.electronIpc = null;
+            addOutput('⚠️ electronIpc no disponible (modo navegador)', 'warning');
+        }
+        
+        if (typeof addOutputLine === 'undefined') {
+            window.addOutputLine = addOutput;
+        }
+        
+        // Funciones mock para testing
+        if (typeof createNewProject === 'undefined') {
+            window.createNewProject = async function() {
+                addOutput('🐟 Mock: createNewProject llamada', 'info');
+                const projectName = prompt('Nombre del proyecto:', 'test-project');
+                if (projectName) {
+                    addOutput(`Mock: Creando proyecto "${projectName}"`, 'info');
+                    addOutput('Mock: Configuración por defecto - spectrum/sdcc/z80', 'info');
+                    addOutput('✅ Mock: Proyecto creado (simulado)', 'success');
+                }
+            };
+        }
+        
+        if (typeof openProject === 'undefined') {
+            window.openProject = async function() {
+                addOutput('🐟 Mock: openProject llamada', 'info');
+                addOutput('Mock: Abriendo proyecto (simulado)', 'info');
+                addOutput('✅ Mock: Proyecto abierto (simulado)', 'success');
+            };
+        }
+        
+        addOutput('🌊 Sistema de test inicializado', 'success');
+    </script>
+</body>
+</html>

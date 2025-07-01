@@ -1,0 +1,21 @@
+{
+  "platform": "spectrum",
+  "compiler": "sdcc",
+  "target": "z80",
+  "description": "ZX Spectrum development configuration",
+  "memory": {
+    "code_start": "0x5CCB",
+    "screen": "0x4000",
+    "attributes": "0x5800"
+  },
+  "compile_flags": [
+    "-mz80",
+    "--no-std-crt0",
+    "--opt-code-size"
+  ],
+  "libraries": [],
+  "defines": [
+    "SPECTRUM",
+    "Z80"
+  ]
+}

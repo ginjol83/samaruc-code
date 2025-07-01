@@ -161,9 +161,9 @@ function createMenu() {
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'Acerca de Retro Game IDE',
-              message: 'Retro Game IDE v1.0.0',
-              detail: 'IDE para desarrollo de juegos retro en C\nDesarrollado con Electron.js'
+              title: 'Acerca de Samaruc Code',
+              message: 'Samaruc Code v1.0.0',
+              detail: '🐟 IDE para desarrollo de juegos retro en C\nInspired by Valencia hispanica\nDesarrollado con Electron.js'
             });
           }
         }
@@ -292,6 +292,104 @@ ipcMain.on('update-window-title', (event, title) => {
     }
   } catch (error) {
     console.error('Error updating window title:', error);
+  }
+});
+
+// Handler para crear directorio
+ipcMain.handle('create-directory', async (event, dirPath) => {
+  try {
+    const fs = require('fs').promises;
+    await fs.mkdir(dirPath, { recursive: true });
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating directory:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Handler para crear proyecto completo
+ipcMain.handle('create-project', async (event, projectPath, projectName, options = {}) => {
+  try {
+    const fs = require('fs').promises;
+    
+    // Crear directorio del proyecto
+    await fs.mkdir(projectPath, { recursive: true });
+    
+    // Crear archivo build.json
+    const buildConfig = {
+      platform: options.platform || "spectrum",
+      compiler: options.compiler || "sdcc", 
+      target: options.target || "z80"
+    };
+    
+    const buildJsonPath = path.join(projectPath, 'build.json');
+    await fs.writeFile(buildJsonPath, JSON.stringify(buildConfig, null, 2), 'utf-8');
+    
+    // Crear archivo main.c básico
+    const mainCContent = `#include <stdio.h>
+
+// ${projectName} - Proyecto creado con Samaruc Code
+// Plataforma: ${buildConfig.platform}
+// Compilador: ${buildConfig.compiler}
+// Target: ${buildConfig.target}
+
+int main() {
+    printf("Hola desde ${projectName}!\\n");
+    printf("Proyecto para ${buildConfig.platform} usando ${buildConfig.compiler}\\n");
+    return 0;
+}`;
+    
+    const mainCPath = path.join(projectPath, 'main.c');
+    await fs.writeFile(mainCPath, mainCContent, 'utf-8');
+    
+    // Crear README.md del proyecto
+    const readmeContent = `# ${projectName}
+
+Proyecto creado con **Samaruc Code** 🐟
+
+## Configuración de Build
+
+- **Plataforma**: ${buildConfig.platform}
+- **Compilador**: ${buildConfig.compiler}
+- **Target**: ${buildConfig.target}
+
+## Archivos
+
+- \`main.c\` - Archivo principal del proyecto
+- \`build.json\` - Configuración de compilación
+- \`README.md\` - Este archivo
+
+## Compilación
+
+Dependiendo de la plataforma configurada, usa el compilador apropiado:
+
+\`\`\`bash
+# Para Z80/Spectrum con SDCC
+sdcc -mz80 main.c
+
+# Para sistemas estándar
+gcc main.c -o ${projectName.toLowerCase()}
+\`\`\`
+
+## Acerca de Samaruc Code
+
+Samaruc Code es un IDE especializado para desarrollo de juegos retro, nombrado en honor al samaruc (*Valencia hispanica*), un pez endémico de la Albufera de Valencia.
+
+¡Que el código fluya como el samaruc en las aguas! 🌊
+`;
+    
+    const readmePath = path.join(projectPath, 'README.md');
+    await fs.writeFile(readmePath, readmeContent, 'utf-8');
+    
+    return { 
+      success: true, 
+      projectPath: projectPath,
+      files: ['main.c', 'build.json', 'README.md']
+    };
+    
+  } catch (error) {
+    console.error('Error creating project:', error);
+    return { success: false, error: error.message };
   }
 });
 

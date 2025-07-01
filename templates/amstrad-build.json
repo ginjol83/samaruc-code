@@ -1,0 +1,22 @@
+{
+  "platform": "amsterdam",
+  "compiler": "sdcc",
+  "target": "z80",
+  "description": "Amstrad CPC development configuration",
+  "memory": {
+    "code_start": "0x4000",
+    "screen": "0xC000",
+    "basic": "0x0170"
+  },
+  "compile_flags": [
+    "-mz80",
+    "--no-std-crt0",
+    "--opt-code-size"
+  ],
+  "libraries": [],
+  "defines": [
+    "AMSTRAD",
+    "CPC",
+    "Z80"
+  ]
+}
