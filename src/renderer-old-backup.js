@@ -52,6 +52,233 @@ let openFiles = new Map();
 let activeFile = null;
 let electronIpc = null; // Cache para ipcRenderer
 
+// Función para añadir líneas al output
+function addOutputLine(message, type = 'info') {
+    const outputContent = document.getElementById('output-content');
+    if (outputContent) {
+        const line = document.createElement('div');
+        line.className = `output-line ${type}`;
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        outputContent.appendChild(line);
+        outputContent.scrollTop = outputContent.scrollHeight;
+        
+        // Mantener solo las últimas 1000 líneas
+        const lines = outputContent.querySelectorAll('.output-line');
+        if (lines.length > 1000) {
+            for (let i = 0; i < lines.length - 1000; i++) {
+                lines[i].remove();
+            }
+        }
+    } else {
+        // Fallback: usar console.log
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+}
+
+// Función para cambiar de panel
+function switchPanel(panelName) {
+    // Ocultar todos los paneles
+    document.querySelectorAll('.panel-section').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    
+    // Desactivar todas las pestañas
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Mostrar el panel seleccionado
+    const selectedPanel = document.getElementById(`${panelName}-panel`);
+    if (selectedPanel) {
+        selectedPanel.classList.add('active');
+    }
+    
+    // Activar la pestaña seleccionada
+    const selectedTab = document.querySelector(`[data-panel="${panelName}"]`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+}
+
+// Función para detectar archivos binarios
+function isBinaryFile(content) {
+    if (typeof content !== 'string') return true;
+    
+    // Verificar caracteres de control que indican contenido binario
+    for (let i = 0; i < Math.min(content.length, 8000); i++) {
+        const code = content.charCodeAt(i);
+        // Permitir: tab (9), line feed (10), carriage return (13), y caracteres imprimibles (32-126)
+        if (code < 9 || (code > 13 && code < 32) || code === 127) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Funciones auxiliares de UI
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateWindowTitle(filePath) {
+    if (filePath) {
+        document.title = `Samaruc Code - ${safePath.basename(filePath)}`;
+    } else {
+        document.title = 'Samaruc Code';
+    }
+}
+
+// Funciones de inicialización faltantes
+function initializeRecentFiles() {
+    try {
+        // Recuperar archivos recientes del localStorage
+        const recentFiles = JSON.parse(localStorage.getItem('samaruc-recent-files') || '[]');
+        
+        // Actualizar el menú de archivos recientes (si existe)
+        const recentMenu = document.getElementById('recent-files-menu');
+        if (recentMenu) {
+            recentMenu.innerHTML = '';
+            
+            if (recentFiles.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'menu-item disabled';
+                emptyItem.textContent = 'No hay archivos recientes';
+                recentMenu.appendChild(emptyItem);
+            } else {
+                recentFiles.slice(0, 10).forEach(filePath => {
+                    const item = document.createElement('div');
+                    item.className = 'menu-item';
+                    item.textContent = safePath.basename(filePath);
+                    item.title = filePath;
+                    item.onclick = () => openFileFromPath(filePath);
+                    recentMenu.appendChild(item);
+                });
+            }
+        }
+        
+        console.log('Archivos recientes inicializados:', recentFiles.length);
+    } catch (error) {
+        console.warn('Error inicializando archivos recientes:', error);
+    }
+}
+
+function initializeDragAndDrop() {
+    try {
+        // Prevenir comportamiento por defecto en toda la ventana
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        // Configurar drop en el editor principal
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+            editorContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                editorContainer.classList.add('drag-over');
+            });
+            
+            editorContainer.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                editorContainer.classList.remove('drag-over');
+            });
+            
+            editorContainer.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                editorContainer.classList.remove('drag-over');
+                
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.path) {
+                        await openFileFromPath(file.path);
+                    }
+                }
+            });
+        }
+        
+        console.log('Drag and drop inicializado');
+    } catch (error) {
+        console.warn('Error inicializando drag and drop:', error);
+    }
+}
+
+function setupKeyboardShortcuts() {
+    try {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + N - Nuevo archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !e.shiftKey) {
+                e.preventDefault();
+                createNewFile();
+                return;
+            }
+            
+            // Ctrl/Cmd + O - Abrir archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'o' && !e.shiftKey) {
+                e.preventDefault();
+                openFile();
+                return;
+            }
+            
+            // Ctrl/Cmd + S - Guardar archivo
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && !e.shiftKey) {
+                e.preventDefault();
+                saveFile();
+                return;
+            }
+            
+            // Ctrl/Cmd + Shift + N - Nuevo proyecto
+            if ((e.ctrlKey || e.metaKey) && e.key === 'N' && e.shiftKey) {
+                e.preventDefault();
+                createNewProject();
+                return;
+            }
+            
+            // Ctrl/Cmd + Shift + O - Abrir proyecto
+            if ((e.ctrlKey || e.metaKey) && e.key === 'O' && e.shiftKey) {
+                e.preventDefault();
+                openProject();
+                return;
+            }
+            
+            // F5 - Compilar/Ejecutar
+            if (e.key === 'F5') {
+                e.preventDefault();
+                compileProject();
+                return;
+            }
+            
+            // Ctrl/Cmd + ` - Alternar panel de salida
+            if ((e.ctrlKey || e.metaKey) && e.key === '`') {
+                e.preventDefault();
+                switchPanel('output');
+                return;
+            }
+            
+            // Escape - Cerrar diálogos
+            if (e.key === 'Escape') {
+                const dialogs = document.querySelectorAll('.modal:not(.hidden)');
+                dialogs.forEach(dialog => dialog.classList.add('hidden'));
+                return;
+            }
+        });
+        
+        console.log('Atajos de teclado configurados');
+    } catch (error) {
+        console.warn('Error configurando atajos de teclado:', error);
+    }
+}
+
 // Inicializar IPC de Electron de forma segura
 function initializeElectronIpc() {
     try {
@@ -63,153 +290,6 @@ function initializeElectronIpc() {
         }
     } catch (error) {
         console.warn('No se pudo inicializar Electron IPC:', error.message);
-        electronIpc = null;
-    }
-    return false;
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM cargado, inicializando aplicación...');
-    
-    try {
-        // Inicializar IPC de Electron ANTES que Monaco
-        const electronAvailable = initializeElectronIpc();
-        console.log('Electron disponible:', electronAvailable);
-        
-        // Test básico de entorno
-        console.log('=== TEST INICIAL ===');
-        console.log('typeof require:', typeof require);
-        console.log('typeof window:', typeof window);
-        console.log('window.process:', window.process);
-        console.log('electronIpc:', !!electronIpc);
-        
-        // Configurar funciones básicas primero
-        setupEventListeners();
-        setupMenuHandlers();
-        setupKeyboardShortcuts();
-        initializeRecentFiles();
-        initializeDragAndDrop();
-        
-        // Inicializar editor (Monaco o básico)
-        if (typeof require !== 'undefined' && require.config) {
-            console.log('Intentando cargar Monaco Editor...');
-            initializeMonaco();
-        } else {
-            console.log('require() no disponible, usando editor básico');
-            initializeBasicEditor();
-        }
-        
-        addOutputLine('IDE iniciado correctamente', 'success');
-        
-    } catch (error) {
-        console.error('Error en inicialización general:', error);
-        addOutputLine(`Error de inicialización: ${error.message}`, 'error');
-        
-        // Inicializar funciones esenciales como fallback
-        try {
-            setupEventListeners();
-            setupKeyboardShortcuts();
-            initializeRecentFiles();
-            initializeDragAndDrop();
-            initializeBasicEditor();
-            addOutputLine('IDE iniciado en modo básico', 'warning');
-        } catch (fallbackError) {
-            console.error('Error crítico en fallback:', fallbackError);
-            addOutputLine(`Error crítico: ${fallbackError.message}`, 'error');
-        }
-    }
-});
-
-// Editor básico sin Monaco (fallback)
-function initializeBasicEditor() {
-    const container = document.getElementById('monaco-editor');
-    container.innerHTML = `
-        <div class="basic-editor">
-            <textarea id="basic-textarea" placeholder="// Editor básico - Monaco Editor no disponible
-#include <stdio.h>
-
-int main() {
-    printf('Hola mundo!\\n');
-    return 0;
-}"></textarea>
-        </div>
-        <style>
-        .basic-editor { width: 100%; height: 100%; }
-        #basic-textarea { 
-            width: 100%; height: 100%; 
-            background: #1e1e1e; color: #d4d4d4; 
-            border: none; font-family: 'Consolas', monospace; 
-            font-size: 14px; padding: 16px;
-            resize: none; outline: none;
-        }
-        </style>
-    `;
-    
-    // Configurar editor básico
-    const textarea = document.getElementById('basic-textarea');
-    textarea.addEventListener('input', () => {
-        if (activeFile) {
-            markFileAsModified(activeFile);
-        }
-    });
-    
-    // Función para obtener contenido
-    window.getEditorContent = () => textarea.value;
-    window.setEditorContent = (content) => textarea.value = content;
-}
-
-// Inicializar Monaco Editor
-function initializeMonaco() {
-    console.log('Iniciando carga de Monaco Editor...');
-    
-    try {
-        // Configurar AMD loader de manera más segura
-        if (typeof require !== 'undefined' && require.config) {
-            require.config({ 
-                paths: { vs: 'https://unpkg.com/monaco-editor@0.34.0/min/vs' },
-                // Evitar conflictos con Electron
-                baseUrl: '.',
-                waitSeconds: 30
-            });
-            
-            // Cargar Monaco con manejo de errores
-            require(['vs/editor/editor.main'], function() {
-                try {
-                    monaco = window.monaco;
-                    
-                    if (!monaco) {
-                        throw new Error('Monaco no se cargó correctamente');
-                    }
-                    
-                    console.log('Monaco Editor cargado correctamente');
-                    
-                    // Configurar tema oscuro
-                    monaco.editor.defineTheme('retro-dark', {
-                        base: 'vs-dark',
-                        inherit: true,
-                        rules: [
-                            { token: 'comment', foreground: '6A9955' },
-                            { token: 'keyword', foreground: '569CD6' },
-                            { token: 'string', foreground: 'CE9178' },
-                            { token: 'number', foreground: 'B5CEA8' },
-                            { token: 'type', foreground: '4EC9B0' },
-                            { token: 'function', foreground: 'DCDCAA' }
-                        ],
-                        colors: {
-                            'editor.background': '#1e1e1e',
-                            'editor.foreground': '#d4d4d4',
-                            'editorLineNumber.foreground': '#858585',
-                            'editor.selectionBackground': '#264f78',
-                            'editor.inactiveSelectionBackground': '#3a3d41'
-                        }
-                    });
-                    
-                    addOutputLine('Editor inicializado correctamente', 'success');
-                    initializeEditor();
-                    
-                } catch (error) {
-                    console.error('Error configurando Monaco:', error);
                     addOutputLine(`Error configurando Monaco: ${error.message}`, 'error');
                     initializeBasicEditor();
                 }
@@ -1024,6 +1104,45 @@ int main() {
         draw_screen();
         update_game();
         
+    printf("Controles: W/A/S/D para moverse, Q para salir\\n");
+}
+
+void update_game() {
+    if (_kbhit()) {
+        char input = _getch();
+        switch (input) {
+            case 'w':
+            case 'W':
+                if (game.y > 0) game.y--;
+                break;
+            case 's':
+            case 'S':
+                if (game.y < HEIGHT - 1) game.y++;
+                break;
+            case 'a':
+            case 'A':
+                if (game.x > 0) game.x--;
+                break;
+            case 'd':
+            case 'D':
+                if (game.x < WIDTH - 1) game.x++;
+                break;
+            case 'q':
+            case 'Q':
+                game.game_over = 1;
+                break;
+        }
+        game.score += 10;
+    }
+}
+
+int main() {
+    init_game();
+    
+    while (!game.game_over) {
+        draw_screen();
+        update_game();
+        
         // Pequeña pausa
         for (int i = 0; i < 10000000; i++);
     }
@@ -1218,45 +1337,6 @@ int main() {
         handle_input();
         update_physics();
         
-        // Pequeña pausa para controlar la velocidad del juego
-        for (int i = 0; i < 8000000; i++);
-    }
-    
-    printf("\\n¡Juego terminado!\\n");
-    printf("Puntuación final: %d\\n", player.score);
-    printf("Presiona cualquier tecla para salir...\\n");
-    _getch();
-    
-    return 0;
-}`
-        },
-        'shooter-game': {
-            name: 'shooter_game',
-            code: `#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
-#include <time.h>
-
-#define WIDTH 25
-#define HEIGHT 20
-#define MAX_BULLETS 10
-#define MAX_ENEMIES 5
-
-typedef struct {
-    int x, y;
-    int active;
-} Bullet;
-
-typedef struct {
-    int x, y;
-    int active;
-} Enemy;
-
-typedef struct {
-    int x, y;
-    int lives;
-    int score;
-    int game_over;
 } Player;
 
 Player player;

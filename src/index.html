@@ -156,6 +156,13 @@
         require = { paths: { 'vs': 'https://unpkg.com/monaco-editor@0.34.0/min/vs' } };
     </script>
     <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
-    <script src="renderer.js"></script>
+    
+    <!-- Modular Scripts - Load in order -->
+    <script src="utils/helpers.js"></script>
+    <script src="utils/ui.js"></script>
+    <script src="editor/editor.js"></script>
+    <script src="file/fileManager.js"></script>
+    <script src="events/events.js"></script>
+    <script src="renderer-new.js"></script>
 </body>
 </html>
