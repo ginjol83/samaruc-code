@@ -1,11 +1,11 @@
-const { app, BrowserW  // En desarrollo, usar webpack dev server
+const { app, BrowserWenu, dialog, ipcMain } = require('electron');  // En desarrollo, usar webpack dev server
   if (process.env.NODE_ENV === 'development' || process.argv.includes('--dev')) {
     mainWindow.loadURL('http://localhost:8080');
     mainWindow.webContents.openDevTools();
   } else {
     // En producción, cargar archivo compilado
     mainWindow.loadFile(path.join(__dirname, '../dist-vue/index.html'));
-  }enu, dialog, ipcMain } = require('electron');
+  }
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
