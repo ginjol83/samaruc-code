@@ -26,13 +26,20 @@ function addOutputLine(message, type = 'info') {
 
 // Función para cambiar de panel
 function switchPanel(panelName) {
+    console.log(`🔄 switchPanel llamado con: '${panelName}'`);
+    
     // Ocultar todos los paneles
-    document.querySelectorAll('.panel-section').forEach(panel => {
+    const allPanels = document.querySelectorAll('.panel-section');
+    console.log(`🔄 Ocultando ${allPanels.length} paneles...`);
+    allPanels.forEach(panel => {
         panel.classList.remove('active');
+        console.log(`   - Panel ${panel.id} oculto`);
     });
     
     // Desactivar todas las pestañas
-    document.querySelectorAll('.panel-tab').forEach(tab => {
+    const allTabs = document.querySelectorAll('.panel-tab');
+    console.log(`🔄 Desactivando ${allTabs.length} pestañas...`);
+    allTabs.forEach(tab => {
         tab.classList.remove('active');
     });
     
@@ -40,12 +47,40 @@ function switchPanel(panelName) {
     const selectedPanel = document.getElementById(`${panelName}-panel`);
     if (selectedPanel) {
         selectedPanel.classList.add('active');
+        console.log(`✅ Panel '${panelName}-panel' activado`);
+    } else {
+        console.error(`❌ Panel '${panelName}-panel' no encontrado`);
     }
     
     // Activar la pestaña seleccionada
     const selectedTab = document.querySelector(`[data-panel="${panelName}"]`);
     if (selectedTab) {
         selectedTab.classList.add('active');
+        console.log(`✅ Pestaña '${panelName}' activada`);
+    } else {
+        console.error(`❌ Pestaña con data-panel='${panelName}' no encontrada`);
+    }
+    
+    // Acciones específicas por panel
+    if (panelName === 'terminal') {
+        console.log('🖥️ Panel terminal seleccionado, inicializando...');
+        // Cuando se selecciona el terminal, asegurar que esté inicializado
+        if (window.terminalManager) {
+            console.log('✅ terminalManager disponible');
+            // Si no hay terminal creada, crear una
+            if (window.terminalManager.terminals.size === 0 && !document.getElementById('simple-terminal-output')) {
+                console.log('🔄 Inicializando terminal al cambiar a pestaña...');
+                window.terminalManager.createTerminal();
+            } else {
+                console.log('🔄 Terminal ya existe, dando foco...');
+            }
+            
+            setTimeout(() => {
+                window.terminalManager.focusCurrentTerminal();
+            }, 100);
+        } else {
+            console.error('❌ terminalManager no disponible');
+        }
     }
 }
 

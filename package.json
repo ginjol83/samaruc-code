@@ -2,7 +2,7 @@
   "name": "samaruc-code",
   "version": "1.0.0",
   "description": "SamaruC Code - IDE para desarrollo de juegos retro en C",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "debug": "set NODE_ENV=development && electron . --dev",
@@ -10,7 +10,11 @@
     "debug-renderer": "set NODE_ENV=development && electron . --remote-debugging-port=9222 --dev",
     "debug-full": "set NODE_ENV=development && electron . --inspect=9229 --remote-debugging-port=9222 --dev",
     "debug-helper": "node debug-helper.js",
-    "generate-icons": "node generate-icons.js"
+    "generate-icons": "node generate-icons.js",
+    "generate-icons-advanced": "node generate-icons-advanced.js",
+    "generate-favicon": "node generate-favicon.js",
+    "refresh": "node refresh-app.js",
+    "update-icons": "node update-icons-from-image.js"
   },
   "author": "Tu Nombre",
   "license": "MIT",
@@ -20,10 +24,12 @@
     "electron": "^22.0.0",
     "electron-builder": "^23.0.0",
     "path-browserify": "^1.0.1",
+    "sharp": "^0.34.2",
     "vue-cli-plugin-electron-builder": "^2.1.1",
     "wait-on": "^6.0.1"
   },
   "dependencies": {
+    "@xterm/xterm": "^5.5.0",
     "monaco-editor": "^0.45.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",

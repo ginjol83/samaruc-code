@@ -30,21 +30,19 @@ function initializeMonaco() {
         }
         
         if (window.monacoStatus === 'failed') {
-            console.warn('⚠️ Monaco falló, usando editor básico');
-            initializeBasicEditor();
+            console.error('⚠️ Monaco falló al cargar');
             reject(new Error('Monaco failed to load'));
             return;
         }
         
         // Monaco debe estar disponible inmediatamente con la nueva implementación
-        // Si no está disponible, usar editor básico
+        // Si no está disponible, es un error
         setTimeout(() => {
             if (window.monaco) {
                 monaco = window.monaco;
                 resolve(monaco);
             } else {
-                console.warn('⚠️ Monaco no disponible, usando editor básico');
-                initializeBasicEditor();
+                console.error('⚠️ Monaco no disponible');
                 reject(new Error('Monaco not available'));
             }
         }, 100);
@@ -67,8 +65,7 @@ function setupEditor() {
         
     } catch (error) {
         console.error('❌ Error configurando Monaco:', error);
-        console.log('🔄 Iniciando editor básico como fallback...');
-        initializeBasicEditor();
+        console.error('🔄 Monaco Editor no disponible');
     }
 }
 
@@ -117,186 +114,6 @@ function setupCLanguage() {
     }
 }
 
-// Inicializar editor básico mejorado (fallback)
-function initializeBasicEditor() {
-    console.log('🔄 Inicializando editor básico mejorado...');
-    
-    const container = document.getElementById('monaco-editor');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="basic-editor-wrapper">
-            <div class="editor-header">
-                <span class="editor-title">
-                    <span class="icon">💻</span> Editor de Código C
-                </span>
-                <span class="editor-status">Monaco Editor no disponible</span>
-            </div>
-            <div class="editor-toolbar">
-                <button onclick="formatCode()" class="btn btn-sm" title="Formatear código">
-                    <span class="icon">📐</span> Formatear
-                </button>
-                <button onclick="clearEditor()" class="btn btn-sm" title="Limpiar editor">
-                    <span class="icon">🗑️</span> Limpiar
-                </button>
-                <span class="line-info" id="line-info">Línea 1, Columna 1</span>
-            </div>
-            <textarea id="basic-textarea" placeholder="Escribe tu código C aquí..."></textarea>
-        </div>
-    `;
-    
-    // Agregar estilos
-    const style = document.createElement('style');
-    style.textContent = `
-        .basic-editor-wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: #1E1E1E;
-            color: #D4D4D4;
-            font-family: 'Consolas', 'Courier New', monospace;
-        }
-        .editor-header {
-            background: #2d2d30;
-            padding: 8px 12px;
-            border-bottom: 1px solid #3e3e42;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-        }
-        .editor-title {
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .editor-status {
-            color: #ffa500;
-            font-size: 11px;
-        }
-        .editor-toolbar {
-            background: #252526;
-            padding: 6px 12px;
-            border-bottom: 1px solid #3e3e42;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn.btn-sm {
-            padding: 4px 8px;
-            font-size: 12px;
-            background: #0e639c;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .btn.btn-sm:hover {
-            background: #1177bb;
-        }
-        .line-info {
-            margin-left: auto;
-            font-size: 11px;
-            color: #858585;
-        }
-        #basic-textarea {
-            flex: 1;
-            background: #1E1E1E;
-            color: #D4D4D4;
-            border: none;
-            outline: none;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            padding: 12px;
-            resize: none;
-            tab-size: 4;
-            white-space: pre;
-            overflow-wrap: normal;
-            overflow-x: auto;
-        }
-        #basic-textarea:focus {
-            background: #1E1E1E;
-            box-shadow: inset 0 0 0 1px #007ACC;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    const textarea = document.getElementById('basic-textarea');
-    if (textarea) {
-        // Valor por defecto
-        textarea.value = `#include <stdio.h>
-
-int main() {
-    printf("Hola, mundo!\\n");
-    return 0;
-}`;
-
-        // Funciones para el editor
-        window.formatCode = function() {
-            let code = textarea.value;
-            // Formateo básico simple
-            textarea.value = code;
-            window.addOutputLine?.('Código formateado', 'info');
-        };
-        
-        window.clearEditor = function() {
-            if (confirm('¿Limpiar el editor?')) {
-                textarea.value = '';
-                updateLineInfo();
-            }
-        };
-
-        // Actualizar información de línea
-        function updateLineInfo() {
-            const lineInfo = document.getElementById('line-info');
-            if (lineInfo) {
-                const lines = textarea.value.substr(0, textarea.selectionStart).split('\\n');
-                const currentLine = lines.length;
-                const currentColumn = lines[lines.length - 1].length + 1;
-                lineInfo.textContent = `Línea ${currentLine}, Columna ${currentColumn}`;
-            }
-        }
-
-        // Event listeners
-        textarea.addEventListener('input', () => {
-            if (activeFile) {
-                const file = openFiles.get(activeFile);
-                if (file) {
-                    file.isModified = true;
-                    file.content = textarea.value;
-                    updateEditorTab(activeFile);
-                }
-            }
-            updateLineInfo();
-        });
-
-        textarea.addEventListener('keyup', updateLineInfo);
-        textarea.addEventListener('click', updateLineInfo);
-        
-        // Soporte para Tab
-        textarea.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-                this.selectionStart = this.selectionEnd = start + 4;
-            }
-        });
-        
-        // Funciones globales
-        window.getEditorContent = () => textarea.value;
-        window.setEditorContent = (content) => textarea.value = content || '';
-        
-        updateLineInfo();
-    }
-    
-    console.log('✅ Editor básico mejorado inicializado');
-    window.addOutputLine?.('Editor básico inicializado - Monaco no disponible', 'warning');
-    window.addOutputLine?.('El editor básico tiene funcionalidades limitadas pero es completamente funcional', 'info');
-}
-
 // Obtener contenido del editor
 function getEditorContent() {
     if (editor && editor.getValue) {
@@ -312,8 +129,6 @@ function getEditorContent() {
 function setEditorContent(content) {
     if (editor && editor.setValue) {
         editor.setValue(content || '');
-    } else if (window.setEditorContent) {
-        window.setEditorContent(content);
     }
 }
 
@@ -421,7 +236,7 @@ function openFileInEditor(fileName, content = '', isTemplate = true) {
         
     } catch (error) {
         console.error('❌ Error creando editor:', error);
-        initializeBasicEditor();
+        window.addOutputLine?.('Error creando Monaco Editor', 'error');
     }
 }
 
@@ -583,49 +398,6 @@ function defineCustomTheme() {
     }
 }
 
-// Inicializar editor básico (fallback)
-function initializeBasicEditor() {
-    const container = document.getElementById('monaco-editor');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="basic-editor">
-            <textarea id="basic-textarea" placeholder="Escribe tu código aquí..."></textarea>
-        </div>
-    `;
-    
-    const textarea = document.getElementById('basic-textarea');
-    if (textarea) {
-        textarea.style.cssText = `
-            width: 100%;
-            height: 100%;
-            background: #1E1E1E;
-            color: #D4D4D4;
-            border: none;
-            outline: none;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            padding: 10px;
-            resize: none;
-            tab-size: 4;
-        `;
-        
-        // Función para establecer contenido
-        window.setEditorContent = (content) => {
-            textarea.value = content || '';
-        };
-        
-        // Función para obtener contenido
-        window.getEditorContent = () => {
-            return textarea.value;
-        };
-    }
-    
-    console.log('Editor básico inicializado');
-    window.addOutputLine?.('Editor básico inicializado', 'info');
-}
-
 // Inicializar editor principal
 function initializeEditor() {
     const container = document.getElementById('monaco-editor');
@@ -652,10 +424,7 @@ function initializeEditor() {
 // Crear editor para archivo
 function createEditor(content = '', language = 'c') {
     if (!monaco) {
-        // Usar editor básico si Monaco no está disponible
-        if (window.setEditorContent) {
-            window.setEditorContent(content);
-        }
+        console.error('Monaco Editor no está disponible');
         return;
     }
     
@@ -799,8 +568,8 @@ function switchToFile(filePath) {
     
     if (monaco) {
         createEditor(fileData.content, language);
-    } else if (window.setEditorContent) {
-        window.setEditorContent(fileData.content);
+    } else {
+        console.error('Monaco Editor no está disponible para cambiar a archivo');
     }
 }
 
@@ -910,7 +679,6 @@ if (typeof window !== 'undefined') {
     window.filesOpenedCount = filesOpenedCount;
     
     window.initializeMonaco = initializeMonaco;
-    window.initializeBasicEditor = initializeBasicEditor;
     window.initializeEditor = initializeEditor;
     window.createEditor = createEditor;
     window.openFileInEditor = openFileInEditor;

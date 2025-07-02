@@ -1,5 +1,6 @@
 /* Variables de tema */
-:root {
+:root,
+[data-theme="dark"] {
     --bg-primary: #1e1e1e;
     --bg-secondary: #2d2d30;
     --bg-tertiary: #3e3e42;
@@ -10,6 +11,11 @@
     --accent-orange: #ca5010;
     --accent-red: #c5282f;
     --border: #3e3e42;
+    
+    /* Variables SamaruC específicas */
+    --samaruc-primary: #4EC9B0;
+    --samaruc-secondary: #569CD6;
+    --samaruc-accent: #4EC9B0;
 }
 
 /* Tema claro (opcional) */
@@ -24,6 +30,11 @@
     --accent-orange: #d83b01;
     --accent-red: #d13438;
     --border: #e0e0e0;
+    
+    /* Variables SamaruC para tema claro */
+    --samaruc-primary: #16825d;
+    --samaruc-secondary: #0e639c;
+    --samaruc-accent: #16825d;
 }
 
 * {
@@ -34,9 +45,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
 }
 
 #app {
@@ -468,13 +482,74 @@ body {
 
 /* Terminal */
 .terminal-output {
-    background-color: #0c0c0c;
-    color: #d4d4d4;
+    padding: 0;
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 14px;
-    padding: 8px;
+    background-color: #1e1e1e;
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
+}
+
+.terminal-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+.terminal-toolbar {
+    background: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    padding: 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 30px;
+    font-size: 12px;
+}
+
+.terminal-toolbar button {
+    background: #007ACC;
+    color: white;
+    border: none;
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.terminal-toolbar button:hover {
+    background: #005a9e;
+}
+
+.terminal-toolbar button:last-child {
+    background: #666666;
+}
+
+.terminal-toolbar button:last-child:hover {
+    background: #888888;
+}
+
+#terminals-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Estilos para xterm.js */
+.xterm {
+    height: 100% !important;
+}
+
+.xterm .xterm-viewport {
+    background-color: #1e1e1e !important;
+}
+
+.xterm .xterm-screen {
+    background-color: #1e1e1e !important;
 }
 
 /* Problemas */
@@ -705,72 +780,19 @@ body {
     pointer-events: none;
 }
 
-/* Tema SamaruC Code - Estilos personalizados */
-.samaruc-theme {
-    --samaruc-primary: #4EC9B0;
-    --samaruc-secondary: #569CD6;
-    --samaruc-accent: #0E639C;
-    --samaruc-success: #4EC9B0;
-    --samaruc-warning: #DCDCAA;
-    --samaruc-error: #F44747;
+/* Forzar tema oscuro por defecto */
+html {
+    background-color: #1e1e1e !important;
+    color: #d4d4d4 !important;
 }
 
-/* Iconos de pez personalizados */
-.fas.fa-fish::before {
-    content: "🐟";
-    font-family: emoji;
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+    background-color: #1e1e1e !important;
+    color: #d4d4d4 !important;
 }
 
-/* Borde con gradiente SamaruC en elementos activos */
-.tab.active {
-    border-bottom: 2px solid var(--samaruc-primary);
-    background: linear-gradient(135deg, #2d2d30 0%, #1e1e1e 100%);
-}
-
-/* Scroll bar con estilo SamaruC */
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--samaruc-accent), var(--samaruc-primary));
-    border-radius: 4px;
-}
-
-/* Estilos para íconos Unicode (reemplazo de Font Awesome) */
-.icon {
-    display: inline-block;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 1em;
-    line-height: 1;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* Ajustes específicos para algunos íconos */
-.toolbar .icon {
-    margin-right: 4px;
-}
-
-.sidebar-header .icon {
-    margin-right: 8px;
-}
-
-.template-card .icon {
-    font-size: 2em;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.panel-tab .icon {
-    margin-right: 6px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 200px;
-    }
-    
-    .template-grid {
-        grid-template-columns: 1fr;
-    }
+/* Asegurar que todos los elementos usen el tema */
+*, *::before, *::after {
+    color: inherit;
 }

@@ -47,9 +47,23 @@ function setupEventListeners() {
     }
     
     // Pestañas del panel inferior
-    document.querySelectorAll('.panel-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            window.switchPanel?.(tab.dataset.panel);
+    const panelTabs = document.querySelectorAll('.panel-tab');
+    console.log('🔧 Configurando', panelTabs.length, 'pestañas de panel...');
+    
+    panelTabs.forEach((tab, index) => {
+        const panelName = tab.dataset.panel;
+        console.log(`🔧 Configurando pestaña ${index}: ${panelName}`);
+        
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log(`🖱️ Click en pestaña: ${panelName}`);
+            
+            if (window.switchPanel) {
+                console.log(`🔄 Llamando switchPanel('${panelName}')`);
+                window.switchPanel(panelName);
+            } else {
+                console.error('❌ switchPanel no disponible');
+            }
         });
     });
     

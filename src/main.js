@@ -47,8 +47,9 @@ function createWindow() {
     },
     title: 'SamaruC Code - IDE para Juegos Retro',
     show: false,
-    // Configuración de ventana
-    icon: path.join(__dirname, 'assets/favicon.svg')
+    // Configuración de ventana e iconos
+    icon: getAppIcon(),
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default'
   });
 
   mainWindow.loadFile('src/index.html');
@@ -59,9 +60,29 @@ function createWindow() {
   });
 
   // Abrir DevTools en modo desarrollo
-  if (process.argv.includes('--dev')) {
+  if (process.argv.includes('--dev') || process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
+
+  // Configurar teclas de acceso rápido para DevTools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    // F12 para abrir/cerrar DevTools
+    if (input.key === 'F12' && input.type === 'keyDown') {
+      if (mainWindow.webContents.isDevToolsOpened()) {
+        mainWindow.webContents.closeDevTools();
+      } else {
+        mainWindow.webContents.openDevTools();
+      }
+    }
+    // Ctrl+Shift+I también para DevTools
+    if (input.key === 'I' && input.control && input.shift && input.type === 'keyDown') {
+      if (mainWindow.webContents.isDevToolsOpened()) {
+        mainWindow.webContents.closeDevTools();
+      } else {
+        mainWindow.webContents.openDevTools();
+      }
+    }
+  });
 
   // Crear menú
   createMenu();
@@ -165,6 +186,43 @@ function createMenu() {
           label: 'Juego de Disparos',
           click: () => {
             mainWindow.webContents.send('menu-template', 'shooter-game');
+          }
+        }
+      ]
+    },
+    {
+      label: 'Desarrollador',
+      submenu: [
+        {
+          label: 'Abrir DevTools',
+          accelerator: 'F12',
+          click: () => {
+            if (mainWindow.webContents.isDevToolsOpened()) {
+              mainWindow.webContents.closeDevTools();
+            } else {
+              mainWindow.webContents.openDevTools();
+            }
+          }
+        },
+        {
+          label: 'Recargar',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            mainWindow.webContents.reload();
+          }
+        },
+        {
+          label: 'Recargar Forzado',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: () => {
+            mainWindow.webContents.reloadIgnoringCache();
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Debug Terminal',
+          click: () => {
+            mainWindow.webContents.executeJavaScript('debugTerminalStatus()');
           }
         }
       ]
@@ -563,7 +621,105 @@ ipcMain.handle('start-monaco-server', async (event) => {
   }
 });
 
-app.whenReady().then(createWindow);
+// Mapa para gestionar terminales activos
+const activeTerminals = new Map(); // terminalId -> { process, shell }
+
+// Configurar IPC para terminales
+function setupTerminalIPC() {
+  console.log('🖥️ Configurando IPC para terminales...');
+  
+  // Crear nueva terminal
+  ipcMain.on('create-terminal', (event, terminalId) => {
+    console.log(`🔧 Creando terminal ${terminalId}...`);
+    
+    try {
+      // Determinar shell según la plataforma
+      let shell, args;
+      if (process.platform === 'win32') {
+        shell = 'powershell.exe';
+        args = ['-NoLogo', '-NoExit'];
+      } else if (process.platform === 'darwin') {
+        shell = 'bash';
+        args = ['-l'];
+      } else {
+        shell = 'bash';
+        args = [];
+      }
+      
+      // Crear proceso hijo
+      const terminalProcess = spawn(shell, args, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        shell: false,
+        windowsHide: true
+      });
+      
+      // Manejar salida del proceso
+      terminalProcess.stdout.on('data', (data) => {
+        event.reply('terminal-data', terminalId, data.toString());
+      });
+      
+      terminalProcess.stderr.on('data', (data) => {
+        event.reply('terminal-data', terminalId, data.toString());
+      });
+      
+      // Manejar cierre del proceso
+      terminalProcess.on('close', (code) => {
+        console.log(`💀 Terminal ${terminalId} cerrada con código ${code}`);
+        event.reply('terminal-closed', terminalId);
+        activeTerminals.delete(terminalId);
+      });
+      
+      terminalProcess.on('error', (error) => {
+        console.error(`❌ Error en terminal ${terminalId}:`, error);
+        event.reply('terminal-data', terminalId, `Error: ${error.message}\r\n`);
+      });
+      
+      // Guardar referencia del proceso
+      activeTerminals.set(terminalId, {
+        process: terminalProcess,
+        shell: shell
+      });
+      
+      // Enviar prompt inicial
+      const prompt = process.platform === 'win32' ? 
+        `PS ${process.cwd()}> ` : 
+        `${process.env.USER || 'user'}@${require('os').hostname()}:${process.cwd()}$ `;
+      
+      event.reply('terminal-data', terminalId, prompt);
+      
+      console.log(`✅ Terminal ${terminalId} creada con ${shell}`);
+      
+    } catch (error) {
+      console.error(`❌ Error creando terminal ${terminalId}:`, error);
+      event.reply('terminal-data', terminalId, `Error creando terminal: ${error.message}\r\n`);
+    }
+  });
+  
+  // Manejar entrada de datos a la terminal
+  ipcMain.on('terminal-input', (event, terminalId, data) => {
+    const terminal = activeTerminals.get(terminalId);
+    if (terminal && terminal.process && !terminal.process.killed) {
+      terminal.process.stdin.write(data);
+    } else {
+      console.warn(`⚠️ Terminal ${terminalId} no encontrada o cerrada`);
+    }
+  });
+  
+  // Cerrar terminal
+  ipcMain.on('close-terminal', (event, terminalId) => {
+    const terminal = activeTerminals.get(terminalId);
+    if (terminal && terminal.process && !terminal.process.killed) {
+      terminal.process.kill();
+      activeTerminals.delete(terminalId);
+      console.log(`🗑️ Terminal ${terminalId} cerrada manualmente`);
+    }
+  });
+}
+
+app.whenReady().then(() => {
+  createWindow();
+  setupTerminalIPC();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -576,3 +732,51 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+// Funciones de utilidad para iconos
+function getAppIcon() {
+  const iconPath = path.join(__dirname, 'src', 'assets');
+  
+  console.log('🎨 Buscando icono en:', iconPath);
+  
+  // Seleccionar el icono apropiado según la plataforma
+  if (process.platform === 'win32') {
+    // Windows prefiere .ico
+    const icoPath = path.join(iconPath, 'icon.ico');
+    console.log('🪟 Verificando ICO:', icoPath, fs.existsSync(icoPath) ? '✅' : '❌');
+    if (fs.existsSync(icoPath)) {
+      console.log('✅ Usando ICO:', icoPath);
+      return icoPath;
+    }
+    // Fallback a PNG
+    const pngPath = path.join(iconPath, 'icon-256.png');
+    console.log('🖼️ Verificando PNG:', pngPath, fs.existsSync(pngPath) ? '✅' : '❌');
+    if (fs.existsSync(pngPath)) {
+      console.log('✅ Usando PNG:', pngPath);
+      return pngPath;
+    }
+  } else if (process.platform === 'darwin') {
+    // macOS prefiere .icns (pero podemos usar PNG)
+    const pngPath = path.join(iconPath, 'icon-512.png');
+    if (fs.existsSync(pngPath)) {
+      return pngPath;
+    }
+  } else {
+    // Linux prefiere PNG
+    const pngPath = path.join(iconPath, 'icon-256.png');
+    if (fs.existsSync(pngPath)) {
+      return pngPath;
+    }
+  }
+  
+  // Fallback universal
+  const svgPath = path.join(iconPath, 'favicon.svg');
+  console.log('🎨 Verificando SVG:', svgPath, fs.existsSync(svgPath) ? '✅' : '❌');
+  if (fs.existsSync(svgPath)) {
+    console.log('✅ Usando SVG fallback:', svgPath);
+    return svgPath;
+  }
+  
+  console.warn('❌ No se encontró icono de aplicación');
+  return null;
+}

@@ -4,23 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SamaruC Code</title>
-    
-    <!-- Múltiples formatos de favicon para mejor compatibilidad -->
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="assets/icon-48.png">
-    <link rel="icon" type="image/png" sizes="64x64" href="assets/icon-64.png">
-    <link rel="apple-touch-icon" sizes="128x128" href="assets/icon-128.png">
-    
-    <!-- Aplicar tema inmediatamente antes de cargar CSS -->
-    <script>
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#1e1e1e';
-        document.documentElement.style.color = '#d4d4d4';
-    </script>
-    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -144,25 +129,10 @@
     </div>
 
     <script>
-        // ===== APLICAR TEMA INMEDIATAMENTE =====
-        (function() {
-            console.log('🎨 Aplicando tema oscuro inmediatamente...');
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.body.style.backgroundColor = '#1e1e1e';
-            document.body.style.color = '#d4d4d4';
-        })();
-        
         // ===== GESTIÓN DE TEMAS =====
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             console.log('🎨 Aplicando tema:', theme);
-            
-            // Forzar colores específicos
-            if (theme === 'dark') {
-                document.body.style.backgroundColor = '#1e1e1e';
-                document.body.style.color = '#d4d4d4';
-                document.documentElement.style.backgroundColor = '#1e1e1e';
-            }
             
             // Actualizar Monaco si está disponible
             if (window.monacoInstance) {

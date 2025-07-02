@@ -17,32 +17,44 @@ let mainWindow;
 // Función para obtener el icono correcto según la plataforma
 function getAppIcon() {
   const iconPath = path.join(__dirname, 'src/assets');
+  console.log('🎨 Buscando iconos en:', iconPath);
   
   // Verificar si existe un icono específico para la plataforma
   if (process.platform === 'win32') {
+    // Probar primero con PNG de alta resolución
+    const png256Path = path.join(iconPath, 'icon-256.png');
+    console.log('🔍 Verificando icon-256.png:', png256Path);
+    if (fs.existsSync(png256Path)) {
+      console.log('✅ Usando icon-256.png:', png256Path);
+      return png256Path;
+    }
+    
     // Windows prefiere ICO
     const icoPath = path.join(iconPath, 'icon.ico');
+    console.log('🔍 Verificando icon.ico:', icoPath);
     if (fs.existsSync(icoPath)) {
+      console.log('✅ Usando icon.ico:', icoPath);
       return icoPath;
-    }
-    // Fallback a PNG
-    const pngPath = path.join(iconPath, 'icon-256.png');
-    if (fs.existsSync(pngPath)) {
-      return pngPath;
     }
   } else if (process.platform === 'darwin') {
     // macOS prefiere ICNS
     const icnsPath = path.join(iconPath, 'icon.icns');
     if (fs.existsSync(icnsPath)) {
+      console.log('✅ Usando icon.icns:', icnsPath);
       return icnsPath;
     }
   }
   
   // Fallback universal
-  return path.join(iconPath, 'icon.svg');
+  const svgPath = path.join(iconPath, 'icon.svg');
+  console.log('🔧 Usando fallback SVG:', svgPath);
+  return svgPath;
 }
 
 function createWindow() {
+  const appIcon = getAppIcon();
+  console.log('🖼️ Icono que se usará para la ventana:', appIcon);
+  
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -56,10 +68,12 @@ function createWindow() {
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     backgroundColor: '#1e1e1e', // Fondo oscuro para evitar flashes blancos
     show: false,
-    icon: getAppIcon(), // Usar función para obtener icono correcto
+    icon: appIcon, // Usar función para obtener icono correcto
     darkTheme: true, // Forzar tema oscuro en Linux
     frame: true // Mantener frame nativo para menú oscuro
   });
+
+  console.log('🪟 Ventana creada con icono:', appIcon);
 
   mainWindow.loadFile('src/index.html');
 

@@ -27,23 +27,25 @@ function initializeElectronIpc() {
     return false;
 }
 
-// Crear nuevo archivo
-function createNewFile() {
-    const fileName = prompt('Nombre del archivo:', 'main.c');
-    if (!fileName) return;
+// Crear nuevo archivo (versión fileManager - NO USAR, usar la de index.html)
+function createNewFileFromManager() {
+    // NO usar prompt() en Electron - generar nombre automático
+    const fileName = `nuevo${Date.now()}.c`; // Nombre único basado en timestamp
     
-    const filePath = window.safePath?.join(window.currentProject || 'nuevo-proyecto', fileName) || fileName;
+    const filePath = window.safePath?.join(window.currentProject || 'nuevo-proyecto', fileName) || `temp://${fileName}`;
     const defaultContent = fileName.endsWith('.c') ? 
-        '// Nuevo archivo\n#include <stdio.h>\n\nint main() {\n    printf("Hola mundo!\\n");\n    return 0;\n}' :
+        `// Nuevo archivo: ${fileName}\n#include <stdio.h>\n\nint main() {\n    printf("¡Hola desde ${fileName}!\\n");\n    return 0;\n}` :
         '// Nuevo archivo\n';
+    
+    console.log('📄 Creando nuevo archivo desde fileManager:', fileName);
     
     // Usar el sistema de pestañas
     if (window.openFileInEditor) {
         window.openFileInEditor(filePath, defaultContent, true);
     } else {
-        // Fallback si no está disponible
-        window.setEditorContent?.(defaultContent);
-        window.addOutputLine?.(`Archivo ${fileName} creado`, 'success');
+        // Error si no está disponible
+        console.error('openFileInEditor no está disponible');
+        window.addOutputLine?.(`Error: No se pudo crear el archivo ${fileName} - Editor no disponible`, 'error');
     }
 }
 

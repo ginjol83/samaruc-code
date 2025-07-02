@@ -59,11 +59,11 @@ async function initializeSamaruCCode() {
                 console.log('Monaco Editor inicializado correctamente');
             } else {
                 console.warn('initializeMonaco no está disponible');
-                window.addOutputLine?.('Monaco Editor no disponible, usando editor básico', 'warning');
+                window.addOutputLine?.('Monaco Editor no disponible', 'error');
             }
         } catch (error) {
             console.error('Error inicializando Monaco:', error);
-            window.addOutputLine?.('Error cargando Monaco Editor, usando editor básico', 'error');
+            window.addOutputLine?.('Error cargando Monaco Editor', 'error');
         }
         
         // 10. Mostrar mensaje de bienvenida
