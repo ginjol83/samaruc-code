@@ -1,5 +1,5 @@
 // renderer.js - Archivo principal modularizado
-// Samaruc Code - IDE para desarrollo de juegos retro
+// SamaruC Code - IDE para desarrollo de juegos retro
 
 // Importar módulos (se cargan via script tags en HTML)
 // Los módulos se autoregistran en window para compatibilidad
@@ -8,14 +8,14 @@
 let isInitialized = false;
 
 // Función de inicialización principal
-async function initializeSamarucCode() {
+async function initializeSamaruCCode() {
     if (isInitialized) {
-        console.log('Samaruc Code ya está inicializado');
+        console.log('SamaruC Code ya está inicializado');
         return;
     }
     
-    console.log('🐟 Iniciando Samaruc Code...');
-    window.addOutputLine?.('Iniciando Samaruc Code IDE...', 'info');
+    console.log('🐟 Iniciando SamaruC Code...');
+    window.addOutputLine?.('Iniciando SamaruC Code IDE...', 'info');
     
     try {
         // 1. Configurar manejo de errores
@@ -49,18 +49,32 @@ async function initializeSamarucCode() {
             window.setupMenuHandlers?.();
         }
         
-        // 9. Inicializar Monaco Editor
-        window.initializeMonaco?.();
+        // 9. Inicializar Monaco Editor (con await para asegurar carga completa)
+        try {
+            console.log('Iniciando carga de Monaco Editor...');
+            window.addOutputLine?.('Cargando Monaco Editor...', 'info');
+            
+            if (window.initializeMonaco) {
+                await window.initializeMonaco();
+                console.log('Monaco Editor inicializado correctamente');
+            } else {
+                console.warn('initializeMonaco no está disponible');
+                window.addOutputLine?.('Monaco Editor no disponible, usando editor básico', 'warning');
+            }
+        } catch (error) {
+            console.error('Error inicializando Monaco:', error);
+            window.addOutputLine?.('Error cargando Monaco Editor, usando editor básico', 'error');
+        }
         
         // 10. Mostrar mensaje de bienvenida
-        window.addOutputLine?.('🐟 Samaruc Code iniciado correctamente', 'success');
+        window.addOutputLine?.('🐟 SamaruC Code iniciado correctamente', 'success');
         window.addOutputLine?.('¡Listo para desarrollar juegos retro!', 'info');
         
         isInitialized = true;
-        console.log('🎉 Samaruc Code inicializado completamente');
+        console.log('🎉 SamaruC Code inicializado completamente');
         
     } catch (error) {
-        console.error('❌ Error inicializando Samaruc Code:', error);
+        console.error('❌ Error inicializando SamaruC Code:', error);
         window.addOutputLine?.(`Error de inicialización: ${error.message}`, 'error');
     }
 }
@@ -116,7 +130,7 @@ async function createNewProject() {
 
 int main() {
     printf("Hola desde ${projectName}!\\n");
-    printf("¡Proyecto creado con Samaruc Code!\\n");
+    printf("¡Proyecto creado con SamaruC Code!\\n");
     return 0;
 }`;
             
@@ -407,15 +421,39 @@ int main() {
 
 // Inicialización cuando el DOM esté listo
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSamarucCode);
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log('DOM Content Loaded - Iniciando SamaruC Code');
+        
+        // Esperar un poco para que todos los scripts se carguen
+        setTimeout(async () => {
+            await initializeSamaruCCode();
+            
+            // Ejecutar diagnóstico en modo desarrollo
+            if (window.diagnoseMonaco) {
+                setTimeout(() => {
+                    window.diagnoseMonaco();
+                }, 2000);
+            }
+        }, 100);
+    });
 } else {
     // DOM ya está cargado
-    initializeSamarucCode();
+    console.log('Documento ya cargado, iniciando inmediatamente');
+    setTimeout(async () => {
+        await initializeSamaruCCode();
+        
+        // Ejecutar diagnóstico en modo desarrollo
+        if (window.diagnoseMonaco) {
+            setTimeout(() => {
+                window.diagnoseMonaco();
+            }, 2000);
+        }
+    }, 100);
 }
 
 // Exportar funciones principales para uso global
 if (typeof window !== 'undefined') {
-    window.initializeSamarucCode = initializeSamarucCode;
+    window.initializeSamaruCCode = initializeSamaruCCode;
     window.createNewProject = createNewProject;
     window.openProject = openProject;
     window.loadProject = loadProject;
@@ -425,4 +463,4 @@ if (typeof window !== 'undefined') {
     window.loadTemplate = loadTemplate;
 }
 
-//console.log('🐟 Samaruc Code renderer.js cargado');
+//console.log('🐟 SamaruC Code renderer.js cargado');

@@ -1,5 +1,5 @@
 // events.js - Gestión de eventos y configuración
-// Samaruc Code - IDE para desarrollo de juegos retro
+// SamaruC Code - IDE para desarrollo de juegos retro
 
 // Configurar event listeners principales
 function setupEventListeners() {

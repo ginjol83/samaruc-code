@@ -1,3 +1,31 @@
+/* Variables de tema */
+:root {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d30;
+    --bg-tertiary: #3e3e42;
+    --text-primary: #d4d4d4;
+    --text-secondary: #cccccc;
+    --accent-blue: #0e639c;
+    --accent-green: #16825d;
+    --accent-orange: #ca5010;
+    --accent-red: #c5282f;
+    --border: #3e3e42;
+}
+
+/* Tema claro (opcional) */
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f3f3;
+    --bg-tertiary: #e0e0e0;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent-blue: #0078d4;
+    --accent-green: #107c10;
+    --accent-orange: #d83b01;
+    --accent-red: #d13438;
+    --border: #e0e0e0;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -6,8 +34,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e1e1e;
-    color: #d4d4d4;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     overflow: hidden;
 }
 
@@ -19,8 +47,8 @@ body {
 
 /* Barra de herramientas */
 .toolbar {
-    background-color: #2d2d30;
-    border-bottom: 1px solid #3e3e42;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
     padding: 8px 16px;
     display: flex;
     align-items: center;
@@ -35,7 +63,7 @@ body {
 }
 
 .btn {
-    background-color: #0e639c;
+    background-color: var(--accent-blue);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -194,7 +222,7 @@ body {
     background-color: #2d2d30;
     color: #969696;
     border: none;
-    padding: 8px 16px;
+    padding: 8px 12px;
     cursor: pointer;
     border-right: 1px solid #3e3e42;
     font-size: 13px;
@@ -202,17 +230,33 @@ body {
     align-items: center;
     gap: 8px;
     white-space: nowrap;
+    max-width: 200px;
+    min-width: 100px;
+    position: relative;
+    transition: all 0.2s ease;
 }
 
 .editor-tab:hover {
-    background-color: #1e1e1e;
+    background-color: #383838;
     color: #d4d4d4;
 }
 
 .editor-tab.active {
     background-color: #1e1e1e;
-    color: #d4d4d4;
-    border-bottom: 2px solid #0e639c;
+    color: #ffffff;
+    border-bottom: 2px solid var(--samaruc-accent, #0e639c);
+}
+
+.editor-tab .tab-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.editor-tab .tab-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .editor-tab .close-btn {
@@ -220,13 +264,21 @@ body {
     border: none;
     color: #8c8c8c;
     cursor: pointer;
-    padding: 0;
-    margin-left: 8px;
-    font-size: 12px;
+    padding: 2px 4px;
+    font-size: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.editor-tab:hover .close-btn {
+    opacity: 1;
 }
 
 .editor-tab .close-btn:hover {
-    color: #d4d4d4;
+    background-color: #f44336;
+    color: #ffffff;
 }
 
 .editor-content {
@@ -653,7 +705,7 @@ body {
     pointer-events: none;
 }
 
-/* Tema Samaruc Code - Estilos personalizados */
+/* Tema SamaruC Code - Estilos personalizados */
 .samaruc-theme {
     --samaruc-primary: #4EC9B0;
     --samaruc-secondary: #569CD6;
@@ -669,16 +721,47 @@ body {
     font-family: emoji;
 }
 
-/* Borde con gradiente Samaruc en elementos activos */
+/* Borde con gradiente SamaruC en elementos activos */
 .tab.active {
     border-bottom: 2px solid var(--samaruc-primary);
     background: linear-gradient(135deg, #2d2d30 0%, #1e1e1e 100%);
 }
 
-/* Scroll bar con estilo Samaruc */
+/* Scroll bar con estilo SamaruC */
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--samaruc-accent), var(--samaruc-primary));
     border-radius: 4px;
+}
+
+/* Estilos para íconos Unicode (reemplazo de Font Awesome) */
+.icon {
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1em;
+    line-height: 1;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ajustes específicos para algunos íconos */
+.toolbar .icon {
+    margin-right: 4px;
+}
+
+.sidebar-header .icon {
+    margin-right: 8px;
+}
+
+.template-card .icon {
+    font-size: 2em;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.panel-tab .icon {
+    margin-right: 6px;
 }
 
 /* Responsive */

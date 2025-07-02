@@ -1,8 +1,8 @@
-# 🐟 Samaruc Code
+# 🐟 SamaruC Code
 
 Un IDE moderno para el desarrollo de juegos retro en C, construido con Electron.js.
 
-*Samaruc Code* lleva el nombre del samaruc (Valencia hispanica), un pequeño pez endémico de la Albufera de Valencia, símbolo de la programación elegante y eficiente.
+*SamaruC Code* lleva el nombre del samaruc (Valencia hispanica), un pequeño pez endémico de la Albufera de Valencia, símbolo de la programación elegante y eficiente.
 
 ## Características
 

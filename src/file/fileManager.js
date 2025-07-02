@@ -1,5 +1,5 @@
 // fileManager.js - Gestión de archivos y proyectos
-// Samaruc Code - IDE para desarrollo de juegos retro
+// SamaruC Code - IDE para desarrollo de juegos retro
 
 // Variables de gestión de archivos
 let electronIpc = null;
@@ -37,7 +37,14 @@ function createNewFile() {
         '// Nuevo archivo\n#include <stdio.h>\n\nint main() {\n    printf("Hola mundo!\\n");\n    return 0;\n}' :
         '// Nuevo archivo\n';
     
-    window.openFileInEditor?.(filePath, defaultContent, true);
+    // Usar el sistema de pestañas
+    if (window.openFileInEditor) {
+        window.openFileInEditor(filePath, defaultContent, true);
+    } else {
+        // Fallback si no está disponible
+        window.setEditorContent?.(defaultContent);
+        window.addOutputLine?.(`Archivo ${fileName} creado`, 'success');
+    }
 }
 
 // Abrir archivo principal
@@ -169,6 +176,7 @@ async function openFileFromPath(filePath) {
 
 // Guardar archivo actual
 async function saveCurrentFile() {
+    // Usar el sistema de pestañas global
     if (!window.activeFile) {
         window.addOutputLine?.('No hay archivo activo para guardar', 'warning');
         return;
@@ -181,6 +189,7 @@ async function saveCurrentFile() {
 async function saveFile(filePath) {
     if (!filePath) return;
     
+    // Usar el sistema de pestañas global
     const fileData = window.openFiles?.get(filePath);
     if (!fileData) {
         window.addOutputLine?.('Archivo no encontrado en la lista de archivos abiertos', 'error');
@@ -188,15 +197,13 @@ async function saveFile(filePath) {
     }
     
     try {
-        const content = window.getCurrentEditorContent?.() || fileData.content;
+        const content = window.getEditorContent?.() || fileData.content;
         
         if (electronIpc) {
             const result = await electronIpc.invoke('save-file', filePath, content);
             if (result.success) {
-                // Marcar como guardado
-                fileData.modified = false;
-                fileData.isNew = false;
-                window.updateTabTitle?.(filePath);
+                // Marcar como guardado usando el sistema de pestañas
+                window.markFileAsSaved?.(filePath);
                 
                 window.addOutputLine?.(`Archivo guardado: ${window.safePath?.basename(filePath) || filePath}`, 'success');
                 addToRecentFiles(filePath);
@@ -205,11 +212,12 @@ async function saveFile(filePath) {
             }
         } else {
             // Fallback: descargar archivo
+            const fileName = filePath.split(/[\/\\]/).pop() || 'archivo.txt';
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = window.safePath?.basename(filePath) || 'archivo.txt';
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

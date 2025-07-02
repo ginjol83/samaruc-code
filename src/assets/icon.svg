@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4EC9B0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0E639C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d2d30;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo circular -->
+  <circle cx="128" cy="128" r="120" fill="url(#backgroundGradient)" stroke="#4EC9B0" stroke-width="8"/>
+  
+  <!-- Cuerpo del pez (samaruc) -->
+  <ellipse cx="128" cy="128" rx="80" ry="40" fill="url(#fishGradient)" transform="rotate(-10 128 128)"/>
+  
+  <!-- Cabeza -->
+  <ellipse cx="90" cy="118" rx="25" ry="20" fill="#4EC9B0"/>
+  
+  <!-- Ojo -->
+  <circle cx="85" cy="115" r="8" fill="#FFFFFF"/>
+  <circle cx="87" cy="113" r="4" fill="#000000"/>
+  
+  <!-- Aleta dorsal -->
+  <path d="M 110 95 Q 130 80 150 95 Q 140 100 130 100 Q 120 100 110 95" fill="#0E639C"/>
+  
+  <!-- Aleta caudal (cola) -->
+  <path d="M 180 125 Q 220 110 230 128 Q 220 146 180 131 Q 190 128 180 125" fill="#0E639C"/>
+  
+  <!-- Aleta ventral -->
+  <path d="M 120 150 Q 135 165 155 150 Q 145 155 135 155 Q 125 155 120 150" fill="#0E639C"/>
+  
+  <!-- Línea lateral -->
+  <path d="M 85 125 Q 120 120 180 128" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.6"/>
+  
+  <!-- Texto SamaruC -->
+  <text x="128" y="200" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4EC9B0">SamaruC</text>
+  <text x="128" y="220" font-family="'Segoe UI', Arial, sans-serif" font-size="12" text-anchor="middle" fill="#CCCCCC">Code</text>
+</svg>

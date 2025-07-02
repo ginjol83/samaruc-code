@@ -1,5 +1,5 @@
 // helpers.js - Funciones auxiliares y utilitarios
-// Samaruc Code - IDE para desarrollo de juegos retro
+// SamaruC Code - IDE para desarrollo de juegos retro
 
 // Helpers seguros para evitar errores de require
 function getIpcRenderer() {
@@ -73,9 +73,9 @@ function formatFileSize(bytes) {
 
 function updateWindowTitle(filePath) {
     if (filePath) {
-        document.title = `Samaruc Code - ${safePath.basename(filePath)}`;
+        document.title = `SamaruC Code - ${safePath.basename(filePath)}`;
     } else {
-        document.title = 'Samaruc Code';
+        document.title = 'SamaruC Code';
     }
 }
 

@@ -1,5 +1,5 @@
 // ui.js - Funciones de interfaz de usuario
-// Samaruc Code - IDE para desarrollo de juegos retro
+// SamaruC Code - IDE para desarrollo de juegos retro
 
 // Función para añadir líneas al output
 function addOutputLine(message, type = 'info') {
@@ -91,7 +91,7 @@ function updateTabTitle(filePath) {
 }
 
 // Mostrar mensaje del samaruc (easter egg)
-function showSamarucMessage() {
+function showSamaruCMessage() {
     const messages = [
         "¡El samaruc nada feliz por tu código! 🐟",
         "Como el samaruc en las aguas del Júcar, tu código fluye con elegancia 💫",
@@ -105,7 +105,7 @@ function showSamarucMessage() {
     
     // Mostrar notificación visual si es posible
     if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Samaruc Code', {
+        new Notification('SamaruC Code', {
             body: randomMessage,
             icon: './assets/samaruc-icon.svg'
         });
@@ -183,6 +183,6 @@ if (typeof window !== 'undefined') {
     window.switchPanel = switchPanel;
     window.createTab = createTab;
     window.updateTabTitle = updateTabTitle;
-    window.showSamarucMessage = showSamarucMessage;
+    window.showSamaruCMessage = showSamaruCMessage;
     window.showCustomDialog = showCustomDialog;
 }

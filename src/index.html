@@ -3,62 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samaruc Code</title>
+    <title>SamaruC Code</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div id="app">
         <!-- Barra de herramientas -->
         <div class="toolbar">
             <div class="toolbar-section">
-                <button id="new-file-btn" class="btn btn-primary tooltip" title="Nuevo archivo (Ctrl+N)" data-tooltip="Crear nuevo archivo">
-                    <i class="fas fa-file-plus"></i>
+                <button id="new-file-btn" class="btn btn-primary tooltip" title="Nuevo archivo (Ctrl+N)">
+                    <span class="icon">📄</span>
                 </button>
-                <div class="file-action-buttons">
-                    <button id="open-file-btn" class="btn btn-primary tooltip" title="Abrir archivo (Ctrl+O)" data-tooltip="Abrir archivo">
-                        <i class="fas fa-folder-open"></i>
-                    </button>
-                    <div class="recent-files-dropdown">
-                        <button id="recent-files-btn" class="recent-files-btn tooltip" title="Archivos recientes" data-tooltip="Ver archivos recientes">
-                            <i class="fas fa-history"></i>
-                        </button>
-                        <div id="recent-files-menu" class="recent-files-menu">
-                            <!-- Los archivos recientes se cargarán dinámicamente -->
-                        </div>
-                    </div>
-                </div>
-                <button id="save-file-btn" class="btn btn-primary tooltip" title="Guardar (Ctrl+S)" data-tooltip="Guardar archivo actual">
-                    <i class="fas fa-save"></i>
+                <button id="open-file-btn" class="btn btn-primary tooltip" title="Abrir archivo (Ctrl+O)">
+                    <span class="icon">📁</span>
+                </button>
+                <button id="save-file-btn" class="btn btn-primary tooltip" title="Guardar (Ctrl+S)">
+                    <span class="icon">💾</span>
                 </button>
             </div>
             <div class="toolbar-section">
                 <button id="compile-btn" class="btn btn-success" title="Compilar (F5)">
-                    <i class="fas fa-hammer"></i> Compilar
+                    <span class="icon">🔨</span> Compilar
                 </button>
                 <button id="run-btn" class="btn btn-success" title="Compilar y Ejecutar (F6)">
-                    <i class="fas fa-play"></i> Ejecutar
+                    <span class="icon">▶️</span> Ejecutar
                 </button>
             </div>
             <div class="toolbar-section">
                 <select id="template-select" class="form-control">
                     <option value="">Seleccionar plantilla...</option>
-                    <optgroup label="🎮 Plantillas de Juegos">
-                        <option value="basic-game">Juego Básico</option>
-                        <option value="platform-game">Juego de Plataformas</option>
-                        <option value="shooter-game">Juego de Disparos</option>
-                    </optgroup>
-                    <optgroup label="📝 Plantillas de C">
-                        <option value="c-basic">Programa Básico</option>
-                        <option value="c-args">Con Argumentos</option>
-                        <option value="c-struct">Con Estructuras</option>
-                        <option value="c-fileio">Manejo de Archivos</option>
-                        <option value="c-memory">Gestión de Memoria</option>
-                    </optgroup>
+                    <option value="basic-game">Juego Básico</option>
+                    <option value="c-basic">Programa Básico C</option>
+                    <option value="c-struct">Con Estructuras</option>
                 </select>
                 <button id="load-template-btn" class="btn btn-info" title="Cargar plantilla">
-                    <i class="fas fa-download"></i>
+                    <span class="icon">⬇️</span>
                 </button>
             </div>
         </div>
@@ -68,13 +48,13 @@
             <!-- Explorador de archivos -->
             <div class="sidebar">
                 <div class="sidebar-header">
-                    <h3><i class="fas fa-folder-tree"></i> Explorador</h3>
+                    <h3><span class="icon">📂</span> Explorador</h3>
                 </div>
                 <div class="file-explorer" id="file-explorer">
                     <div class="no-project">
                         <p>No hay proyecto abierto</p>
                         <button id="open-project-btn" class="btn btn-secondary">
-                            <i class="fas fa-folder-open"></i> Abrir Proyecto
+                            <span class="icon">📁</span> Abrir Proyecto
                         </button>
                     </div>
                 </div>
@@ -87,39 +67,34 @@
                 </div>
                 <div class="editor-content">
                     <div id="monaco-editor" class="monaco-editor-container">
-                        <div class="welcome-screen">
-                            <div class="welcome-content">
-                                <h1><i class="fas fa-fish"></i> Samaruc Code</h1>
-                                <p>IDE para desarrollo de juegos retro en C</p>
-                                <div class="welcome-actions">
-                                    <button class="btn btn-primary btn-large" onclick="openProject()">
-                                        <i class="fas fa-folder-open"></i> Abrir Proyecto
-                                    </button>
-                                    <button class="btn btn-secondary btn-large" onclick="createNewProject()">
-                                        <i class="fas fa-plus"></i> Nuevo Proyecto
-                                    </button>
-                                </div>
-                                <div class="templates-section">
-                                    <h3>Plantillas de Juegos</h3>
-                                    <div class="template-grid">
-                                        <div class="template-card" onclick="loadTemplate('basic-game')">
-                                            <i class="fas fa-cube"></i>
-                                            <h4>Juego Básico</h4>
-                                            <p>Estructura básica para un juego simple</p>
-                                        </div>
-                                        <div class="template-card" onclick="loadTemplate('platform-game')">
-                                            <i class="fas fa-running"></i>
-                                            <h4>Plataformas</h4>
-                                            <p>Juego de plataformas estilo Mario</p>
-                                        </div>
-                                        <div class="template-card" onclick="loadTemplate('shooter-game')">
-                                            <i class="fas fa-crosshairs"></i>
-                                            <h4>Disparos</h4>
-                                            <p>Juego de disparos estilo Space Invaders</p>
-                                        </div>
-                                    </div>
-                                </div>
+                        <!-- Monaco Editor se carga aquí -->
+                        <div style="width: 100%; height: 100%; display: flex; flex-direction: column; background: #1E1E1E; color: #D4D4D4;">
+                            <div style="background: #2d2d30; padding: 8px 12px; border-bottom: 1px solid #3e3e42; font-size: 13px; display: flex; justify-content: space-between;">
+                                <span style="color: #ffffff;">🐟 SamaruC Code - Editor C</span>
+                                <span id="editor-status" style="color: #ffa500; font-size: 11px;">Cargando Monaco...</span>
                             </div>
+                            <textarea id="basic-editor" style="
+                                flex: 1;
+                                background: #1E1E1E;
+                                color: #D4D4D4;
+                                border: none;
+                                outline: none;
+                                font-family: 'Consolas', 'Courier New', monospace;
+                                font-size: 14px;
+                                line-height: 1.5;
+                                padding: 12px;
+                                resize: none;
+                                tab-size: 4;
+                                white-space: pre;
+                                overflow-wrap: normal;
+                                overflow-x: auto;
+                            " placeholder="Escribe tu código C aquí...">#include <stdio.h>
+
+int main() {
+    printf("¡Hola desde SamaruC Code!\\n");
+    printf("🐟 Monaco Editor cargando...\\n");
+    return 0;
+}</textarea>
                         </div>
                     </div>
                 </div>
@@ -130,19 +105,19 @@
         <div class="bottom-panel">
             <div class="panel-tabs">
                 <button class="panel-tab active" data-panel="output">
-                    <i class="fas fa-terminal"></i> Salida
+                    <span class="icon">📟</span> Salida
                 </button>
                 <button class="panel-tab" data-panel="terminal">
-                    <i class="fas fa-code"></i> Terminal
+                    <span class="icon">💻</span> Terminal
                 </button>
                 <button class="panel-tab" data-panel="problems">
-                    <i class="fas fa-exclamation-triangle"></i> Problemas
+                    <span class="icon">⚠️</span> Problemas
                 </button>
             </div>
             <div class="panel-content">
                 <div id="output-panel" class="panel-section active">
                     <div id="output-content" class="console-output">
-                        <div class="output-line">Listo para compilar...</div>
+                        <div class="output-line success">🐟 SamaruC Code iniciado - Editor básico activo</div>
                     </div>
                 </div>
                 <div id="terminal-panel" class="panel-section">
@@ -159,19 +134,393 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
-        // Configurar Monaco Editor desde CDN
-        require = { paths: { 'vs': 'https://unpkg.com/monaco-editor@0.34.0/min/vs' } };
+        // ===== GESTIÓN DE TEMAS =====
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            
+            // Actualizar Monaco si está disponible
+            if (monacoInstance) {
+                const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs';
+                monaco.editor.setTheme(monacoTheme);
+            }
+            
+            addOutputLine(`🎨 Tema cambiado a: ${theme}`, 'info');
+        }
+        
+        // Escuchar cambios de tema desde el main process
+        if (window.require) {
+            try {
+                const { ipcRenderer } = window.require('electron');
+                
+                ipcRenderer.on('theme-changed', (event, theme) => {
+                    applyTheme(theme);
+                });
+                
+                ipcRenderer.on('system-theme-changed', (event, themeInfo) => {
+                    console.log('🎨 Tema del sistema cambió:', themeInfo);
+                    // Aplicar automáticamente si está en modo 'system'
+                    if (themeInfo.themeSource === 'system') {
+                        applyTheme(themeInfo.shouldUseDarkColors ? 'dark' : 'light');
+                    }
+                });
+            } catch (error) {
+                console.warn('IPC no disponible para temas:', error);
+            }
+        }
+        
+        // ===== VARIABLES GLOBALES =====
+        let basicEditor = document.getElementById('basic-editor');
+        let monacoInstance = null;
+        let openFiles = new Map();
+        let activeFile = null;
+        let fileCounter = 1;
+        
+        // ===== FUNCIONES DE UTILIDAD =====
+        function updateStatus(message, color = '#ffa500') {
+            const statusElement = document.getElementById('editor-status');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.style.color = color;
+            }
+        }
+        
+        function addOutputLine(message, type = 'info') {
+            const output = document.getElementById('output-content');
+            if (output) {
+                const line = document.createElement('div');
+                line.className = 'output-line';
+                line.style.color = type === 'success' ? '#4CAF50' : 
+                                  type === 'error' ? '#F44336' : 
+                                  type === 'warning' ? '#FF9800' : '#ffffff';
+                line.textContent = message;
+                output.appendChild(line);
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+        
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'c': return '📝';
+                case 'h': return '📄';
+                case 'cpp': case 'cc': return '📘';
+                case 'js': return '💛';
+                case 'html': return '🌐';
+                case 'css': return '🎨';
+                case 'md': return '📖';
+                case 'txt': return '📃';
+                default: return '📄';
+            }
+        }
+        
+        // ===== SISTEMA DE PESTAÑAS =====
+        function createTab(filePath, fileName, content, isNew = false) {
+            if (openFiles.has(filePath)) {
+                switchToTab(filePath);
+                return;
+            }
+            
+            const tabsContainer = document.getElementById('editor-tabs');
+            const tab = document.createElement('div');
+            tab.className = 'editor-tab';
+            tab.dataset.filepath = filePath;
+            
+            tab.innerHTML = `
+                <span class="tab-icon">${getFileIcon(fileName)}</span>
+                <span class="tab-name">${fileName}</span>
+                <button class="close-btn" onclick="closeTab('${filePath}', event)" title="Cerrar">×</button>
+            `;
+            
+            tab.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('close-btn')) {
+                    switchToTab(filePath);
+                }
+            });
+            
+            tabsContainer.appendChild(tab);
+            
+            openFiles.set(filePath, {
+                fileName: fileName,
+                content: content,
+                isModified: isNew,
+                isNew: isNew,
+                monacoModel: null
+            });
+            
+            switchToTab(filePath);
+            addOutputLine(`📄 Archivo ${fileName} abierto`, 'success');
+        }
+        
+        function switchToTab(filePath) {
+            // Guardar contenido del archivo actual
+            if (activeFile && (monacoInstance || basicEditor)) {
+                const currentContent = getEditorContent();
+                if (openFiles.has(activeFile)) {
+                    const fileInfo = openFiles.get(activeFile);
+                    fileInfo.content = currentContent;
+                    openFiles.set(activeFile, fileInfo);
+                }
+            }
+            
+            // Actualizar pestañas visualmente
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.filepath === filePath) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Cargar contenido del nuevo archivo
+            const fileInfo = openFiles.get(filePath);
+            if (fileInfo) {
+                activeFile = filePath;
+                updateStatus(`Editando: ${fileInfo.fileName}`, '#4CAF50');
+                
+                if (monacoInstance) {
+                    if (!fileInfo.monacoModel) {
+                        fileInfo.monacoModel = window.monaco.editor.createModel(fileInfo.content, 'c');
+                        openFiles.set(filePath, fileInfo);
+                    }
+                    monacoInstance.setModel(fileInfo.monacoModel);
+                } else {
+                    setEditorContent(fileInfo.content);
+                }
+            }
+        }
+        
+        function closeTab(filePath, event) {
+            if (event) event.stopPropagation();
+            
+            const fileInfo = openFiles.get(filePath);
+            if (!fileInfo) return;
+            
+            if (fileInfo.isModified && !confirm(`¿Guardar cambios en ${fileInfo.fileName}?`)) {
+                return;
+            }
+            
+            const tab = document.querySelector(`[data-filepath="${filePath}"]`);
+            if (tab) tab.remove();
+            
+            openFiles.delete(filePath);
+            
+            if (activeFile === filePath) {
+                const remainingFiles = Array.from(openFiles.keys());
+                if (remainingFiles.length > 0) {
+                    switchToTab(remainingFiles[0]);
+                } else {
+                    createNewFile();
+                }
+            }
+            
+            addOutputLine(`❌ Archivo ${fileInfo.fileName} cerrado`, 'info');
+        }
+        
+        function createNewFile() {
+            const fileName = `nuevo${fileCounter}.c`;
+            const filePath = `temp://${fileName}`;
+            const defaultContent = `#include <stdio.h>
+
+int main() {
+    printf("¡Hola desde SamaruC Code!\\n");
+    printf("Archivo: ${fileName}\\n");
+    return 0;
+}`;
+            
+            fileCounter++;
+            createTab(filePath, fileName, defaultContent, true);
+        }
+        
+        function openFileInEditor(filePath, content, isNew = false) {
+            const fileName = filePath.split(/[\/\\]/).pop();
+            createTab(filePath, fileName, content, isNew);
+        }
+        
+        function markFileAsModified(filePath = activeFile) {
+            if (!filePath || !openFiles.has(filePath)) return;
+            
+            const fileInfo = openFiles.get(filePath);
+            if (!fileInfo.isModified) {
+                fileInfo.isModified = true;
+                openFiles.set(filePath, fileInfo);
+                
+                const tab = document.querySelector(`[data-filepath="${filePath}"]`);
+                if (tab) {
+                    const tabName = tab.querySelector('.tab-name');
+                    if (tabName && !tabName.textContent.endsWith('*')) {
+                        tabName.textContent += '*';
+                    }
+                }
+            }
+        }
+        
+        function markFileAsSaved(filePath = activeFile) {
+            if (!filePath || !openFiles.has(filePath)) return;
+            
+            const fileInfo = openFiles.get(filePath);
+            fileInfo.isModified = false;
+            openFiles.set(filePath, fileInfo);
+            
+            const tab = document.querySelector(`[data-filepath="${filePath}"]`);
+            if (tab) {
+                const tabName = tab.querySelector('.tab-name');
+                if (tabName && tabName.textContent.endsWith('*')) {
+                    tabName.textContent = tabName.textContent.slice(0, -1);
+                }
+            }
+        }
+        
+        // ===== FUNCIONES DE EDITOR =====
+        window.getEditorContent = function() {
+            return monacoInstance ? monacoInstance.getValue() : (basicEditor ? basicEditor.value : '');
+        };
+        
+        window.setEditorContent = function(content) {
+            if (monacoInstance) {
+                if (activeFile && openFiles.has(activeFile)) {
+                    const fileInfo = openFiles.get(activeFile);
+                    if (fileInfo.monacoModel) {
+                        fileInfo.monacoModel.setValue(content || '');
+                    } else {
+                        monacoInstance.setValue(content || '');
+                    }
+                } else {
+                    monacoInstance.setValue(content || '');
+                }
+            } else if (basicEditor) {
+                basicEditor.value = content || '';
+            }
+        };
+        
+        // ===== CARGA DE MONACO EDITOR =====
+        function loadMonacoEditor() {
+            if (window.monaco) {
+                createMonacoEditor();
+                return;
+            }
+            
+            updateStatus('Cargando Monaco Editor...', '#2196F3');
+            const basePath = window.location.href.replace('/src/index.html', '');
+            
+            // Cargar CSS
+            const css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = basePath + '/src/monaco/vs/editor/editor.main.css';
+            css.onload = () => loadMonacoScript(basePath);
+            css.onerror = () => fallbackToBasicEditor();
+            document.head.appendChild(css);
+        }
+        
+        function loadMonacoScript(basePath) {
+            const loader = document.createElement('script');
+            loader.src = basePath + '/src/monaco/vs/loader.js';
+            loader.onload = () => configureMonaco(basePath);
+            loader.onerror = () => fallbackToBasicEditor();
+            document.head.appendChild(loader);
+        }
+        
+        function configureMonaco(basePath) {
+            if (typeof require === 'undefined') {
+                fallbackToBasicEditor();
+                return;
+            }
+            
+            require.config({ paths: { 'vs': basePath + '/src/monaco/vs' } });
+            window.MonacoEnvironment = {
+                getWorkerUrl: () => basePath + '/src/monaco/vs/base/worker/workerMain.js'
+            };
+            
+            require(['vs/editor/editor.main'], 
+                () => setTimeout(() => window.monaco ? createMonacoEditor() : fallbackToBasicEditor(), 500),
+                () => fallbackToBasicEditor()
+            );
+        }
+        
+        function createMonacoEditor() {
+            try {
+                const container = document.getElementById('monaco-editor');
+                if (!container) {
+                    fallbackToBasicEditor();
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                monacoInstance = window.monaco.editor.create(container, {
+                    value: basicEditor ? basicEditor.value : '#include <stdio.h>\n\nint main() {\n    printf("Monaco funcionando!\\n");\n    return 0;\n}',
+                    language: 'c',
+                    theme: 'vs-dark',
+                    fontSize: 14,
+                    automaticLayout: true
+                });
+                
+                monacoInstance.onDidChangeModelContent(() => {
+                    if (activeFile) markFileAsModified(activeFile);
+                });
+                
+                if (activeFile && openFiles.has(activeFile)) {
+                    const fileInfo = openFiles.get(activeFile);
+                    const model = window.monaco.editor.createModel(fileInfo.content, 'c');
+                    fileInfo.monacoModel = model;
+                    monacoInstance.setModel(model);
+                    openFiles.set(activeFile, fileInfo);
+                }
+                
+                if (basicEditor) basicEditor.style.display = 'none';
+                
+                window.editor = monacoInstance;
+                updateStatus('Monaco Editor activo', '#4CAF50');
+                addOutputLine('✅ Monaco Editor funcionando', 'success');
+                
+            } catch (error) {
+                fallbackToBasicEditor();
+            }
+        }
+        
+        function fallbackToBasicEditor() {
+            updateStatus('Editor básico activo', '#4CAF50');
+            addOutputLine('📝 Usando editor básico', 'warning');
+        }
+        
+        // ===== CONFIGURACIÓN DEL EDITOR BÁSICO =====
+        if (basicEditor) {
+            basicEditor.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
+                }
+            });
+            
+            basicEditor.addEventListener('input', function() {
+                if (activeFile) markFileAsModified(activeFile);
+            });
+        }
+        
+        // ===== EXPONER FUNCIONES GLOBALMENTE =====
+        window.createTab = createTab;
+        window.switchToTab = switchToTab;
+        window.closeTab = closeTab;
+        window.createNewFile = createNewFile;
+        window.openFileInEditor = openFileInEditor;
+        window.markFileAsModified = markFileAsModified;
+        window.markFileAsSaved = markFileAsSaved;
+        window.addOutputLine = addOutputLine;
+        
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus('Iniciando SamaruC Code...', '#2196F3');
+            addOutputLine('🐟 SamaruC Code iniciado', 'success');
+            
+            createNewFile();
+            setTimeout(() => loadMonacoEditor(), 500);
+        });
     </script>
-    <script src="https://unpkg.com/monaco-editor@0.34.0/min/vs/loader.js"></script>
     
-    <!-- Modular Scripts - Load in order -->
-    <script src="utils/helpers.js"></script>
-    <script src="utils/ui.js"></script>
-    <script src="editor/editor.js"></script>
+    <!-- Scripts modulares -->
     <script src="file/fileManager.js"></script>
     <script src="events/events.js"></script>
-    <script src="renderer.js"></script>
 </body>
 </html>
