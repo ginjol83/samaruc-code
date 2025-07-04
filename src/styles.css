@@ -124,6 +124,37 @@ body {
     background-color: #0099cc;
 }
 
+/* Active button state */
+.btn.active {
+    background-color: var(--samaruc-accent) !important;
+    color: white !important;
+    box-shadow: 0 0 8px rgba(78, 201, 176, 0.5);
+}
+
+.btn.active:hover {
+    background-color: var(--samaruc-primary) !important;
+    box-shadow: 0 0 12px rgba(78, 201, 176, 0.7);
+}
+
+/* Estilos específicos para botones retro */
+.btn#gameboy-btn.active {
+    background-color: #9BBC0F !important;
+    color: #1e1e1e !important;
+    box-shadow: 0 0 8px rgba(155, 188, 15, 0.6);
+}
+
+.btn#spectrum-btn.active {
+    background-color: #FF6B6B !important;
+    color: #000000 !important;
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+}
+
+.btn#basic-btn.active {
+    background-color: #00FF00 !important;
+    color: #000080 !important;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+}
+
 .btn-large {
     padding: 12px 24px;
     font-size: 16px;
@@ -203,16 +234,94 @@ body {
     font-weight: 500;
 }
 
-.file-item.folder .fa-folder {
+.file-item.folder .icon {
     color: #dcb67a;
 }
 
-.file-item.file .fa-file {
+.file-item.file .icon {
     color: #7b96b3;
 }
 
-.file-item.c-file .fa-file {
+.file-item.c-file .icon {
     color: #5cb85c;
+}
+
+/* Estilos para el explorador de archivos */
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid #3e3e42;
+    background-color: #2d2d30;
+    margin-bottom: 8px;
+}
+
+.project-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.project-title {
+    font-size: 14px;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: auto;
+}
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.file-item:hover {
+    background-color: #2a2d2e;
+}
+
+.file-item.active {
+    background-color: #094771;
+    color: white;
+}
+
+.file-item.folder {
+    font-weight: 500;
+}
+
+.file-item.folder .icon {
+    color: #dcb67a;
+}
+
+.file-item.file .icon {
+    color: #7b96b3;
+}
+
+.file-item.c-file .icon {
+    color: #5cb85c;
+}
+
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Editor */
@@ -221,6 +330,48 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+.editor-header {
+    background-color: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 35px;
+    padding: 0 12px;
+}
+
+.editor-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.editor-title .icon {
+    font-size: 16px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-small {
+    background-color: #404040;
+    color: #ffffff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.btn-small:hover {
+    background-color: #007ACC;
 }
 
 .editor-tabs {
@@ -795,4 +946,446 @@ html[data-theme="dark"] body {
 /* Asegurar que todos los elementos usen el tema */
 *, *::before, *::after {
     color: inherit;
+}
+
+/* Estilos para iconos SVG */
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+}
+
+.icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+.btn .icon {
+    margin-right: 6px;
+}
+
+.btn .icon:last-child {
+    margin-right: 0;
+}
+
+/* Iconos en pestañas de panel */
+.panel-tab .icon {
+    margin-right: 6px;
+}
+
+.panel-tab .icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Iconos en encabezados */
+h3 .icon {
+    margin-right: 8px;
+}
+
+h3 .icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Gameboy Mode Styles */
+.gameboy-mode {
+    filter: sepia(30%) saturate(70%) hue-rotate(80deg) brightness(0.9);
+}
+
+.gameboy-mode .toolbar {
+    background: linear-gradient(135deg, #8b956d 0%, #6b7a52 100%);
+    border-bottom: 2px solid #4a5238;
+}
+
+.gameboy-mode .editor-container {
+    background: #9bbc0f;
+    color: #0f380f;
+}
+
+.gameboy-mode .monaco-editor {
+    background: #9bbc0f !important;
+    color: #0f380f !important;
+}
+
+.gameboy-mode .monaco-editor .view-lines {
+    background: #9bbc0f !important;
+    color: #0f380f !important;
+}
+
+.gameboy-mode .sidebar {
+    background: #8b956d;
+    border-right: 2px solid #4a5238;
+}
+
+.gameboy-mode .bottom-panel {
+    background: #8b956d;
+    border-top: 2px solid #4a5238;
+}
+
+.gameboy-mode .terminal {
+    background: #9bbc0f !important;
+    color: #0f380f !important;
+}
+
+.gameboy-mode .btn {
+    background: #6b7a52;
+    color: #c7f0c7;
+    border: 1px solid #4a5238;
+}
+
+.gameboy-mode .btn:hover {
+    background: #5a6b45;
+    box-shadow: 0 0 5px rgba(155, 188, 15, 0.3);
+}
+
+.gameboy-mode .btn.active {
+    background: #9bbc0f !important;
+    color: #0f380f !important;
+    border: 1px solid #0f380f;
+}
+
+/* ZX Spectrum Mode Styles */
+.spectrum-mode {
+    filter: contrast(150%) saturate(120%) hue-rotate(200deg);
+}
+
+.spectrum-mode .toolbar {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-bottom: 2px solid #ff0080;
+}
+
+.spectrum-mode .editor-container {
+    background: #000000;
+    color: #ffffff;
+    border: 2px solid #00ffff;
+}
+
+.spectrum-mode .monaco-editor {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+.spectrum-mode .monaco-editor .view-lines {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+.spectrum-mode .sidebar {
+    background: #1a1a1a;
+    border-right: 2px solid #ffff00;
+    color: #ffffff;
+}
+
+.spectrum-mode .bottom-panel {
+    background: #1a1a1a;
+    border-top: 2px solid #ff0080;
+    color: #ffffff;
+}
+
+.spectrum-mode .terminal {
+    background: #000000 !important;
+    color: #00ff00 !important;
+    font-family: 'Courier New', monospace;
+}
+
+.spectrum-mode .btn {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #00ffff;
+}
+
+.spectrum-mode .btn:hover {
+    background: #404040;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.spectrum-mode .btn.active {
+    background: #ff0080 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 8px rgba(255, 0, 128, 0.7);
+}
+
+.spectrum-mode .panel-tab {
+    background: #2d2d2d;
+    color: #ffffff;
+    border-bottom: 2px solid #00ffff;
+}
+
+.spectrum-mode .panel-tab.active {
+    background: #ff0080;
+    color: #ffffff;
+}
+
+.spectrum-mode .file-item {
+    color: #ffffff;
+}
+
+.spectrum-mode .file-item:hover {
+    background-color: #404040;
+    color: #00ffff;
+}
+
+.spectrum-mode .output-line {
+    font-family: 'Courier New', monospace;
+}
+
+/* ====== BASIC TERMINAL MODE ====== */
+.basic-mode {
+    background-color: #000080;
+    color: #00ff00;
+}
+
+.basic-mode .toolbar {
+    background: linear-gradient(90deg, #000080, #0000a0);
+    border-bottom: 2px solid #00ff00;
+}
+
+.basic-mode .editor-container {
+    background-color: #000080;
+    border: 2px solid #00ff00;
+    border-radius: 0;
+}
+
+.basic-mode .monaco-editor {
+    background-color: #000080 !important;
+    color: #00ff00 !important;
+}
+
+.basic-mode .monaco-editor .view-lines {
+    color: #00ff00 !important;
+}
+
+.basic-mode .sidebar {
+    background-color: #000050;
+    border-right: 2px solid #00ff00;
+    color: #00ff00;
+}
+
+.basic-mode .bottom-panel {
+    background-color: #000050;
+    border-top: 2px solid #00ff00;
+    color: #00ff00;
+}
+
+.basic-mode .terminal {
+    background-color: #000080;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+}
+
+.basic-mode .btn {
+    background-color: #000080;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    border-radius: 0;
+}
+
+.basic-mode .btn:hover {
+    background-color: #0000a0;
+    color: #ffffff;
+}
+
+.basic-mode .btn.active {
+    background-color: #00ff00;
+    color: #000080;
+    font-weight: bold;
+}
+
+.basic-mode .panel-tab {
+    background-color: #000050;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    border-radius: 0;
+}
+
+.basic-mode .panel-tab.active {
+    background-color: #00ff00;
+    color: #000080;
+}
+
+.basic-mode .file-item {
+    color: #00ff00;
+}
+
+.basic-mode .file-item:hover {
+    background-color: #0000a0;
+    color: #ffffff;
+}
+
+.basic-mode .output-line {
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+}
+
+/* Diálogos HTML personalizados */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+}
+
+.dialog-container {
+    background-color: #2d2d30;
+    border: 1px solid #3e3e42;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: dialogFadeIn 0.2s ease-out;
+}
+
+@keyframes dialogFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.dialog-header {
+    background-color: #1e1e1e;
+    padding: 16px 20px;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dialog-close {
+    background: none;
+    border: none;
+    color: #969696;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dialog-close:hover {
+    background-color: #404040;
+    color: #ffffff;
+}
+
+.dialog-content {
+    padding: 20px;
+    color: #d4d4d4;
+}
+
+.dialog-content p {
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.dialog-subtitle {
+    color: #969696;
+    font-size: 14px;
+    margin-bottom: 20px !important;
+}
+
+.sdk-options, .compile-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sdk-option, .compile-option {
+    background-color: #1e1e1e;
+    border: 2px solid #3e3e42;
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+}
+
+.sdk-option:hover, .compile-option:hover {
+    border-color: #007ACC;
+    background-color: rgba(0, 122, 204, 0.1);
+}
+
+.sdk-option.selected, .compile-option.selected {
+    border-color: #007ACC;
+    background-color: rgba(0, 122, 204, 0.2);
+}
+
+.sdk-icon, .option-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.sdk-info, .option-info {
+    flex: 1;
+}
+
+.sdk-info strong, .option-info strong {
+    display: block;
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.sdk-info p, .option-info p {
+    margin: 0;
+    color: #969696;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.dialog-footer {
+    background-color: #252526;
+    padding: 16px 20px;
+    border-top: 1px solid #3e3e42;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .dialog-container {
+        width: 95%;
+        max-width: none;
+    }
+    
+    .sdk-option, .compile-option {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .sdk-icon, .option-icon {
+        font-size: 24px;
+    }
 }

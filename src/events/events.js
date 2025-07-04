@@ -10,10 +10,18 @@ function setupEventListeners() {
         newFileBtn: document.getElementById('new-file-btn'),
         openFileBtn: document.getElementById('open-file-btn'),
         saveFileBtn: document.getElementById('save-file-btn'),
+        cutBtn: document.getElementById('cut-btn'),
+        copyBtn: document.getElementById('copy-btn'),
+        pasteBtn: document.getElementById('paste-btn'),
         compileBtn: document.getElementById('compile-btn'),
         runBtn: document.getElementById('run-btn'),
         loadTemplateBtn: document.getElementById('load-template-btn'),
-        openProjectBtn: document.getElementById('open-project-btn')
+        openProjectBtn: document.getElementById('open-project-btn'),
+        gameboyBtn: document.getElementById('gameboy-btn'),
+        spectrumBtn: document.getElementById('spectrum-btn'),
+        basicBtn: document.getElementById('basic-btn'),
+        searchBtn: document.getElementById('search-btn'),
+        findReplaceBtn: document.getElementById('find-replace-btn')
     };
     
 /*    console.log('Elementos encontrados:', Object.fromEntries(
@@ -30,10 +38,27 @@ function setupEventListeners() {
         });
     }
     if (elements.saveFileBtn) elements.saveFileBtn.addEventListener('click', window.saveCurrentFile);
-    if (elements.compileBtn) elements.compileBtn.addEventListener('click', window.compileProject);
+    if (elements.cutBtn) elements.cutBtn.addEventListener('click', window.cutText);
+    if (elements.copyBtn) elements.copyBtn.addEventListener('click', window.copyText);
+    if (elements.pasteBtn) elements.pasteBtn.addEventListener('click', window.pasteText);
+    if (elements.compileBtn) {
+        elements.compileBtn.addEventListener('click', () => {
+            console.log('🔨 Botón compilar clickeado en event listener');
+            if (window.compileProject) {
+                window.compileProject();
+            } else {
+                console.error('❌ window.compileProject no está disponible');
+            }
+        });
+    }
     if (elements.runBtn) elements.runBtn.addEventListener('click', window.compileAndRun);
     if (elements.loadTemplateBtn) elements.loadTemplateBtn.addEventListener('click', window.loadSelectedTemplate);
     if (elements.openProjectBtn) elements.openProjectBtn.addEventListener('click', window.openProject);
+    if (elements.gameboyBtn) elements.gameboyBtn.addEventListener('click', window.toggleGameboyMode);
+    if (elements.spectrumBtn) elements.spectrumBtn.addEventListener('click', window.toggleSpectrumMode);
+    if (elements.basicBtn) elements.basicBtn.addEventListener('click', window.toggleBasicMode);
+    if (elements.searchBtn) elements.searchBtn.addEventListener('click', window.openSearch);
+    if (elements.findReplaceBtn) elements.findReplaceBtn.addEventListener('click', window.openFindReplace);
     
     // Selector de plantillas
     const templateSelect = document.getElementById('template-select');
@@ -95,6 +120,41 @@ function setupKeyboardShortcuts() {
             if ((e.ctrlKey || e.metaKey) && e.key === 's' && !e.shiftKey) {
                 e.preventDefault();
                 window.saveCurrentFile?.();
+                return;
+            }
+            
+            // Ctrl/Cmd + X - Cortar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'x' && !e.shiftKey) {
+                e.preventDefault();
+                window.cutText?.();
+                return;
+            }
+            
+            // Ctrl/Cmd + C - Copiar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c' && !e.shiftKey) {
+                e.preventDefault();
+                window.copyText?.();
+                return;
+            }
+            
+            // Ctrl/Cmd + V - Pegar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !e.shiftKey) {
+                e.preventDefault();
+                window.pasteText?.();
+                return;
+            }
+            
+            // Ctrl/Cmd + F - Buscar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f' && !e.shiftKey) {
+                e.preventDefault();
+                window.openSearch?.();
+                return;
+            }
+            
+            // Ctrl/Cmd + H - Buscar y reemplazar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'h' && !e.shiftKey) {
+                e.preventDefault();
+                window.openFindReplace?.();
                 return;
             }
             

@@ -1,6 +1,6 @@
 {
   "name": "samaruc-code",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "SamaruC Code - IDE para desarrollo de juegos retro en C",
   "main": "main.js",
   "scripts": {

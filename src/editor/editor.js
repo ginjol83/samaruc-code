@@ -231,6 +231,9 @@ function openFileInEditor(fileName, content = '', isTemplate = true) {
             }
         });
         
+        // Configurar listeners del editor
+        setupEditorListeners(editor);
+        
         console.log(`✅ Archivo abierto: ${fileName}`);
         window.addOutputLine?.(`Archivo abierto: ${fileName}`, 'info');
         
@@ -238,6 +241,27 @@ function openFileInEditor(fileName, content = '', isTemplate = true) {
         console.error('❌ Error creando editor:', error);
         window.addOutputLine?.('Error creando Monaco Editor', 'error');
     }
+}
+
+// Configurar listeners para el editor
+function setupEditorListeners(editorInstance) {
+    if (!editorInstance) return;
+    
+    // Listener para cambios en el contenido
+    editorInstance.onDidChangeModelContent(() => {
+        // Marcar archivo como modificado
+        if (window.markFileAsModified) {
+            window.markFileAsModified(true);
+        }
+    });
+    
+    // Listener para cambios de selección
+    editorInstance.onDidChangeCursorPosition((e) => {
+        // Actualizar información de posición si es necesaria
+        // console.log('Cursor position:', e.position);
+    });
+    
+    console.log('✅ Listeners del editor configurados');
 }
 
 // Actualizar pestaña del editor
